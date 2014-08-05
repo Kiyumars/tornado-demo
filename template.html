@@ -1,0 +1,65 @@
+<html>
+<head>
+	<title>Rotten Critics</title>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript">
+
+	$(document).ready(function(){
+		//print out actor name on page
+		$('#actor').focusout(function(){
+			var actor = $('#actor').val();
+			$('#print_actor').text(actor);
+		});
+		//only extend number of players if number is entered
+		$('#moreplayers').click(function(){
+			var player_num = parseInt($('#num_players').val());
+
+			if(player_num){
+				for(var i=2; i < player_num + 1; i++ ){
+					console.log(i);
+					var player_html ="<input name='player " + String(i) + "' placeholder='Player " + String(i) + "'></br>";
+					$(player_html).appendTo('#more_players');
+					console.log(player_html);
+				};
+			};
+		});
+		//print out number of players
+		$('#print_now').click(function(){
+			var number_players = $('.players input').length;
+			var players_object = $('.players input');
+			for(i=1; i <= number_players; i++){
+				var playerName = '[name="player '+i+'"]';
+				console.log($(playerName).val());
+
+			};
+			console.log(number_players);
+			console.log(players_object);			
+
+		});
+	});
+</script>
+</head>
+<body>
+
+	
+	<form action='/'>
+	
+	<div class='players'>
+	<input name='player 1' placeholder='Player 1'/></br>
+	<div id='more_players'></div>
+	</div>
+	
+	<input type='button' name='print_now' id='print_now' value="Print this now."></br>
+	<input type='text' name='num_players' id='num_players'>
+	<input type='button' name='moreplayers' id='moreplayers' value='More players'><br><br>
+	<input type='button' name='number_players' id='number_players' value='Number of players'><br>
+	
+	<input name='actor' id='actor' placeholder='Which actor?'>
+	</form>	
+	
+	<div id='print_actor' name='print_actor'></div>
+	<div id='num_player'></div>
+</body>
+
+</html>
