@@ -26,8 +26,8 @@
 		});
 		//print out number of players
 		$('#print_now').click(function(){
-			var number_players = $('.players input').length;
-			var players_object = $('.players input');
+			var number_players = $('.players input').length;	
+		var players_object = $('.players input');
 			for(i=1; i <= number_players; i++){
 				var playerName = '[name="player '+i+'"]';
 				console.log($(playerName).val());
@@ -36,6 +36,15 @@
 			console.log(number_players);
 			console.log(players_object);			
 
+		});
+		//Print out a surprise
+		$('#surprise').click(function(){
+
+			$.get('/surprise').done(function (result) {
+				$('#surpriseMofo').html(result);
+
+			});
+			return false;
 		});
 	});
 </script>
@@ -54,12 +63,15 @@
 	<input type='text' name='num_players' id='num_players'>
 	<input type='button' name='moreplayers' id='moreplayers' value='More players'><br><br>
 	<input type='button' name='number_players' id='number_players' value='Number of players'><br>
-	
+	<input type='button' id="python" value='Python Response'></input>
 	<input name='actor' id='actor' placeholder='Which actor?'>
+	<input type='button' name='surprise' id='surprise' value='Surprise me!'>
 	</form>	
 	
 	<div id='print_actor' name='print_actor'></div>
 	<div id='num_player'></div>
+	<div id='surpriseMofo'></div>
+	<div id='python_response'></div>
 </body>
 
 </html>
