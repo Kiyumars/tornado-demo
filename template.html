@@ -43,6 +43,7 @@
 
 		//print out number of players
 		$('#print_now').click(function(){
+			$('#playerInfo').html('');
 			var number_players = $('.players input').length;
 			var player_list = [];
 
@@ -86,34 +87,30 @@
 <body>
 
 	
+	
+	
+	<actor><b>Choose an actor</b><actor>
+	<input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br>
+	<input name='actor' id='actor' placeholder='Which actor?'><br>
+	<input type="button" id='print_entered_actor' value="Print actor's name."><br>
+	<div id='print_actor' name='print_actor'>  </div> <br><br><br>
+
 	<form action='/'>
 	
 	<playerTitle><b>Player List</b><playerTitle>
 	<input type='button' name='moreplayers' id='moreplayers' value='More players?'>
 	<input type='text' name='num_players' id='num_players' placeholder='How many players in total?'><br>
 	<div class='players'>
-	<input name='player1' id='player1' placeholder='Enter name of player 1'/>
+	<br><input name='player1' id='player1' placeholder='Enter name of player 1'/>
 	<div id='more_players'></div>
 	</div>
-	
-	
-	<!-- <input type='button' id='enter_player_num' value='Confirm number of players'><br><br> -->
-	
 	<input type='button' name='print_now' id='print_now' value="Print player names."><br>
 	<div id="playerInfo"></div></br><br><br>
-	<actor><b>Choose an actor</b><actor>
-	<input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br> 
-	<input name='actor' id='actor' placeholder='Which actor?'>
-	<input type="button" id='print_entered_actor' value="Print actor's name."></input>
-	<div id='print_actor' name='print_actor'>
-
-
 	</form>	
-	
 	
 	<div id='num_player'></div>
 	<div id='python_response'></div>
-	<div id="more_payers"></div>
+
 </body>
 
 </html>
