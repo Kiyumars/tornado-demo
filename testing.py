@@ -7,15 +7,23 @@ class MainHandler(tornado.web.RequestHandler):
 		player_numbers = range(1,9)
 		self.render("template.html", title='title', player_numbers=player_numbers)
 
+
 class SurpriseHandler(tornado.web.RequestHandler):
 	def get(self):
 		pic = 'http://i.imgur.com/THnYk7c.jpg'
 		pic_href = "<img src='" + pic + "'>"
-		self.write(pic_href)			
+		self.write(pic_href)
 
+
+class ActorHandler(tornado.web.RequestHandler):
+	def get(self):
+		actor_name = self.get_argument('actorName')
+		message = "Oh, " + actor_name + ", I love that actor."
+		self.write(message)
 
 application = tornado.web.Application([(r"/", MainHandler),
-										(r"/surprise", SurpriseHandler)])
+										(r"/surprise", SurpriseHandler),
+										(r"/getactor", ActorHandler)])
 
 if __name__ == "__main__":
 	application.listen(8888)
