@@ -78,7 +78,11 @@
 
 		$('#print_entered_actor').click(function(){
 			var entered_actor = $('#actor').val();
-			$('#print_actor').text(entered_actor);
+			if (entered_actor){
+				$('#print_actor').text(entered_actor);
+			}else{
+				$('#print_actor').text("Please enter an actor's name.");
+			};
 
 		});
 	});
@@ -97,7 +101,7 @@
 
 	<form action='/'>
 	
-	<playerTitle><b>Player List</b><playerTitle>
+	<playerTitle><b>Player List</b></playerTitle>
 	<input type='button' name='moreplayers' id='moreplayers' value='More players?'>
 	<input type='text' name='num_players' id='num_players' placeholder='How many players in total?'><br>
 	<div class='players'>
