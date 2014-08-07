@@ -68,6 +68,7 @@
 
 		$('#get_entered_actor').click(function(){
 			var actor_name = $('#actor').val();
+			$('#python_response').text('')
 			$.ajax({
 				type: 'GET',
 				url: '/getactor',
@@ -109,15 +110,6 @@
 
 	
 	
-	
-	<actor><b>Choose an actor</b><actor>
-	<input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br>
-	<input name='actor' id='actor' placeholder='Which actor?'><br>
-	<input type="button" id='print_entered_actor' value="Print actor's name."><br>
-	<input type='button' id='get_entered_actor' value='Look up actor.'>
-	<div id='python_response'></div>
-	<div id='print_actor' name='print_actor'>  </div> <br><br><br>
-
 
 	<form action='/'>
 	
@@ -134,6 +126,16 @@
 	
 	<div id='num_player'></div>
 	
+
+	<actor><b>Choose an actor</b><actor>
+	<input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br>
+	<input name='actor' id='actor' placeholder='Which actor?'><br>
+	<input type="button" id='print_entered_actor' value="Print actor's name."><br>
+	<input type='button' id='get_entered_actor' value='Look up actor.'>
+	<div id='python_response'></div>
+	<div id='print_actor' name='print_actor'>  </div> <br><br><br>
+
+
 
 </body>
 

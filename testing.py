@@ -2,6 +2,12 @@ import tornado.ioloop
 import tornado.web
 import tornado.autoreload
 
+from rottentomatoes import RT
+import imdb
+
+imd = imdb.IMDb()
+
+
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		player_numbers = range(1,9)
@@ -18,8 +24,15 @@ class SurpriseHandler(tornado.web.RequestHandler):
 class ActorHandler(tornado.web.RequestHandler):
 	def get(self):
 		actor_name = self.get_argument('actorName')
-		message = "Oh, " + actor_name + ", I love that actor."
-		self.write(message)
+		actor_object = imd.search_person(actor_name)[0]
+		imd.update(actor_object)
+		self.write(actor_object['mini biography'][0])
+
+		# message = "Oh, " + actor_name + ", I love that actor."
+		# self.write(message)
+
+
+
 
 application = tornado.web.Application([(r"/", MainHandler),
 										(r"/surprise", SurpriseHandler),
