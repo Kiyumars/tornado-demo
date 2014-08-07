@@ -68,11 +68,17 @@
 
 		//Print out a surprise
 		$('#surprise').click(function(){
-			$.get('/surprise').done(function (result) {
-				$('#surpriseMofo').html(result);
+			var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
+			var actor_list_length = random_actors.length;
+			var rand_index = Math.floor((Math.random()* actor_list_length));
+			var chosen_actor = random_actors[rand_index];
+			$('#print_actor').text(chosen_actor);
+		});
 
-			});
-			return false;
+		$('#print_entered_actor').click(function(){
+			var entered_actor = $('#actor').val();
+			$('#print_actor').text(entered_actor);
+
 		});
 	});
 </script>
@@ -81,8 +87,7 @@
 
 	
 	<form action='/'>
-	<input name='actor' id='actor' placeholder='Which actor?'><br> 
-		<div id='print_actor' name='print_actor'></div> 
+	
 	<playerTitle><b>Player List</b><playerTitle>
 	<input type='button' name='moreplayers' id='moreplayers' value='More players?'>
 	<input type='text' name='num_players' id='num_players' placeholder='How many players in total?'><br>
@@ -96,12 +101,12 @@
 	
 	<input type='button' name='print_now' id='print_now' value="Print player names."><br>
 	<div id="playerInfo"></div></br><br><br>
+	<actor><b>Choose an actor</b><actor>
+	<input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br> 
+	<input name='actor' id='actor' placeholder='Which actor?'>
+	<input type="button" id='print_entered_actor' value="Print actor's name."></input>
+	<div id='print_actor' name='print_actor'>
 
-	<!-- <input type='button' name='number_players' id='number_players' value='Number of players'><br> -->
-	<!-- <input type='button' id="python" value='Python Response'></input> -->
-	
-	<input type='button' name='surprise' id='surprise' value='Surprise me!'>
-	<div id='surpriseMofo'></div><br><br><br>
 
 	</form>	
 	
