@@ -6,40 +6,67 @@
 	<script type="text/javascript">
 
 	$(document).ready(function(){
+		$('#num_players').hide();
+		$('#enter_player_num').hide();
+
+
 		//print out actor name on page
 		$('#actor').focusout(function(){
 			var actor = $('#actor').val();
 			$('#print_actor').text(actor);
 		});
-		//only extend number of players if number is entered
-		$('#moreplayers').click(function(){
-			var player_num = parseInt($('#num_players').val());
 
+
+		//show input fields necessary for additonal players
+		$('#moreplayers').click(function(){
+			$('#enter_player_num').toggle();
+			$('#num_players').toggle();
+
+		});
+
+
+		//Create additonal inputs for more players
+		$('#num_players').keyup(function(){
+			var player_num = parseInt($('#num_players').val());
+			$('#more_players').html('')
 			if(player_num){
 				for(var i=2; i < player_num + 1; i++ ){
 					console.log(i);
-					var player_html ="<input name='player " + String(i) + "' placeholder='Player " + String(i) + "'></br>";
+					var player_html ="<input name='player" + String(i) + "' id='player" + String(i) + "' placeholder='Enter name of player " + String(i) + "'></br>";
 					$(player_html).appendTo('#more_players');
 					console.log(player_html);
 				};
 			};
 		});
+
+
 		//print out number of players
 		$('#print_now').click(function(){
-			var number_players = $('.players input').length;	
-		var players_object = $('.players input');
-			for(i=1; i <= number_players; i++){
-				var playerName = '[name="player '+i+'"]';
-				console.log($(playerName).val());
+			var number_players = $('.players input').length;
+			var player_list = [];
 
+			for(var i=1; i <= number_players; i++){
+				var player_ID = "#player" + String(i);
+				var player_name = String($(player_ID).val());
+				//exclude empty fields
+				if(player_name){
+					player_list.push(player_name);
+				};
 			};
-			console.log(number_players);
-			console.log(players_object);			
+			for(x=0; x < player_list.length; x++){
+				var player_entry = "Player " + String(x + 1) + ": " + player_list[x] + "<br>";
+				$('#playerInfo').append(player_entry);	
+			}; 
+				// console.log(player_entry);
+				// $((playerName).val()).appendTo('#playerInfo');	
+			
+			// $("#playerInfo").html(player_info);
+
 
 		});
+
 		//Print out a surprise
 		$('#surprise').click(function(){
-
 			$.get('/surprise').done(function (result) {
 				$('#surpriseMofo').html(result);
 
@@ -53,25 +80,34 @@
 
 	
 	<form action='/'>
-	
+	<input name='actor' id='actor' placeholder='Which actor?'> <br><br><br>
+	<playerTitle><b>Player List</b><playerTitle>
+	<input type='button' name='moreplayers' id='moreplayers' value='More players?'>
+	<input type='text' name='num_players' id='num_players' placeholder='How many players in total?'><br>
 	<div class='players'>
-	<input name='player 1' placeholder='Player 1'/></br>
+	<input name='player1' id='player1' placeholder='Enter name of player 1'/>
 	<div id='more_players'></div>
 	</div>
 	
-	<input type='button' name='print_now' id='print_now' value="Print this now."></br>
-	<input type='text' name='num_players' id='num_players'>
-	<input type='button' name='moreplayers' id='moreplayers' value='More players'><br><br>
-	<input type='button' name='number_players' id='number_players' value='Number of players'><br>
-	<input type='button' id="python" value='Python Response'></input>
-	<input name='actor' id='actor' placeholder='Which actor?'>
+	
+	<!-- <input type='button' id='enter_player_num' value='Confirm number of players'><br><br> -->
+	
+	<input type='button' name='print_now' id='print_now' value="Print player names."><br>
+	<div id="playerInfo"></div></br><br><br>
+
+	<!-- <input type='button' name='number_players' id='number_players' value='Number of players'><br> -->
+	<!-- <input type='button' id="python" value='Python Response'></input> -->
+	<div id='print_actor' name='print_actor'></div>
+	
 	<input type='button' name='surprise' id='surprise' value='Surprise me!'>
+	<div id='surpriseMofo'></div><br><br><br>
+
 	</form>	
 	
-	<div id='print_actor' name='print_actor'></div>
+	
 	<div id='num_player'></div>
-	<div id='surpriseMofo'></div>
 	<div id='python_response'></div>
+	<div id="more_payers"></div>
 </body>
 
 </html>
