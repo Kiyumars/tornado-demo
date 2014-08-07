@@ -12,8 +12,9 @@
 
 		//print out actor name on page
 		$('#actor').focusout(function(){
-			var actor = $('#actor').val();
-			$('#print_actor').text(actor);
+			var actor_name = $('#actor').val();
+			var actor_entry = actor_name + "<br><br><br>";
+			$('#print_actor').html(actor_entry);
 		});
 
 
@@ -80,7 +81,8 @@
 
 	
 	<form action='/'>
-	<input name='actor' id='actor' placeholder='Which actor?'> <br><br><br>
+	<input name='actor' id='actor' placeholder='Which actor?'><br> 
+		<div id='print_actor' name='print_actor'></div> 
 	<playerTitle><b>Player List</b><playerTitle>
 	<input type='button' name='moreplayers' id='moreplayers' value='More players?'>
 	<input type='text' name='num_players' id='num_players' placeholder='How many players in total?'><br>
@@ -97,7 +99,6 @@
 
 	<!-- <input type='button' name='number_players' id='number_players' value='Number of players'><br> -->
 	<!-- <input type='button' id="python" value='Python Response'></input> -->
-	<div id='print_actor' name='print_actor'></div>
 	
 	<input type='button' name='surprise' id='surprise' value='Surprise me!'>
 	<div id='surpriseMofo'></div><br><br><br>
