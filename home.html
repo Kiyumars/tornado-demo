@@ -7,7 +7,7 @@
 	$(document).ready(function(){
 		vex.dialog.open({
 			message: "Which actor/actress are we searching for?",
-			input: "<input name=\'actor\' id='actor' placeholder='Which actor?' required \>",
+			input: "<input name=\'actor\' id='actor' placeholder='Which actor?' required />",
 			callback: function(value){
 				// var actor_input = value;
 				// console.log(actor_input);
@@ -24,6 +24,48 @@
 
 
 		});
+
+		vex.dialog.open({
+			message: "What's your name?",
+			input: "<input name=\'player_name\' placeholder='Your name, please.' required />",
+			callback: function(value){
+				// var actor_input = value;
+				// console.log(actor_input);
+				$.ajax({
+				type: 'POST',
+				url: '/getplayer',
+				data: {player_name: value.player_name},
+				// success: function(result){
+				// 	$('#python_response').text(result);
+				// }
+				});
+
+			}
+
+
+		});
+
+		// vex.dialog.open({
+
+		// 	message: "How many players?",
+		// 	input: "<input name=\'num_of_players\' type='text' default='1' />",
+		// 	callback: function(value){
+
+
+		// 		var entered_num = parseInt(value.num_of_players);
+		// 		var input_html = '';
+		// 		for(i=1; i <= entered_num; i++){
+		// 			input_html.append("<input name=\'Player" + String(i) + "\' placeholder='Player"+ String(i)+ "'/>");
+
+		// 		};
+		// 		vex.dialog.open({
+		// 			message: "What are the player names?",
+		// 			console.log(input_html)
+		// 			input: input_html,
+		// 		});
+
+		// 	}
+		// });
 
 		$('#num_players').hide();
 		$('#enter_player_num').hide();

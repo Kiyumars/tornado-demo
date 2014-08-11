@@ -10,7 +10,9 @@ import imdb
 imd = imdb.IMDb()
 rt = RT()
 ACTOR = None
-PLAYERS = {}
+# PLAYERS = {}
+PLAYER = None
+
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -32,18 +34,22 @@ class ActorHandler(tornado.web.RequestHandler):
 		actor_object = imd.search_person(actor_name)[0]
 		imd.update(actor_object)
 		ACTOR = actor_object
+		print actor_object['name']
 
 		# self.write(actor_object['mini biography'][0])
 
 
 
 class PlayerHandler(tornado.web.RequestHandler):
-	def get(self):
-		global PLAYERS
-		player_dict = self.get_argument('player_names')
-		for i in range(len(player_dict)):
-			player_index = 'Player' + str(i + 1 )
-			PLAYERS[player_index] = player_dict[player_index]
+	def post(self):
+		# global PLAYERS
+		# player_dict = self.get_argument('player_names')
+		# for i in range(len(player_dict)):
+		# 	player_index = 'Player' + str(i + 1 )
+		# 	PLAYERS[player_index] = player_dict[player_index]
+		global PLAYER
+		PLAYER = self.get_argument('player_name')
+		print PLAYER
 
 
 class GameHandler(tornado.web.RequestHandler):
@@ -63,7 +69,8 @@ application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/surprise", SurpriseHandler),
 										(r"/getactor", ActorHandler),
-										(r"/game", GameHandler)
+										(r"/game", GameHandler),
+										(r"/getplayer", PlayerHandler)
 										],
 										static_path="static")
 
