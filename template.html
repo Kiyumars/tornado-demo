@@ -10,11 +10,30 @@
 		$('#enter_player_num').hide();
 
 
+		//only start game if there is at least one player and one actor defined
+		function enable_start_button(){
+			if($('#player1').val() != '' && $('#actor').val() != ''){
+				$('#start_game').removeAttr('disabled');
+			}else{
+				$('#start_game').attr('disabled', true);
+			};
+		};
+
+
 		//print out actor name on page
 		$('#actor').focusout(function(){
 			var actor_name = $('#actor').val();
 			var actor_entry = actor_name + "<br><br><br>";
 			$('#print_actor').html(actor_entry);
+			
+		});
+		$('#actor').keyup(function(){
+			enable_start_button();
+		});
+
+
+		$('#player1').change(function(){
+			enable_start_button();
 		});
 
 
@@ -55,6 +74,7 @@
 					player_list.push(player_name);
 				};
 			};
+			//print out player names
 			for(x=0; x < player_list.length; x++){
 				var player_entry = "Player " + String(x + 1) + ": " + player_list[x] + "<br>";
 				$('#playerInfo').append(player_entry);	
@@ -65,7 +85,7 @@
 			// $("#playerInfo").html(player_info);
 		});
 
-
+		//get imdb info through tornado request handler
 		$('#get_entered_actor').click(function(){
 			var actor_name = $('#actor').val();
 			$('#python_response').text('')
@@ -74,18 +94,13 @@
 				url: '/getactor',
 				data: {actorName: actor_name},
 				success: function(result){
-
 					$('#python_response').text(result);
 				}
-
-
 				});
-
-
 		});
 
 
-		//Print out a surprise
+		//Print out a surprise actor
 		$('#surprise').click(function(){
 			var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
 			var actor_list_length = random_actors.length;
@@ -103,6 +118,7 @@
 			};
 
 		});
+
 	});
 </script>
 </head>
@@ -128,13 +144,13 @@
 	
 
 	<actor><b>Choose an actor</b><actor>
-	<input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br>
+	<!-- <input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br> -->
 	<input name='actor' id='actor' placeholder='Which actor?'><br>
-	<input type="button" id='print_entered_actor' value="Print actor's name."><br>
+	<!-- <input type="button" id='print_entered_actor' value="Print actor's name."><br> -->
 	<input type='button' id='get_entered_actor' value='Look up actor.'>
 	<div id='python_response'></div>
-	<div id='print_actor' name='print_actor'>  </div> <br><br><br>
-
+	<!-- <div id='print_actor' name='print_actor'>  </div> <br><br><br> -->
+	<input type='button' id='start_game' value="Let's start the game!" disabled=true>
 
 
 </body>

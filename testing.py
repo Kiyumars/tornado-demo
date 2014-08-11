@@ -6,6 +6,7 @@ from rottentomatoes import RT
 import imdb
 
 imd = imdb.IMDb()
+rt = RT()
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -28,11 +29,11 @@ class ActorHandler(tornado.web.RequestHandler):
 		imd.update(actor_object)
 		self.write(actor_object['mini biography'][0])
 
-		# message = "Oh, " + actor_name + ", I love that actor."
-		# self.write(message)
 
-
-
+class MovieHandler(tornado.web.RequestHandler):
+	def get(self):
+		movie_title = self.get_argument()
+		movie_search = rt.feeling_lucky(movie_title)
 
 application = tornado.web.Application([(r"/", MainHandler),
 										(r"/surprise", SurpriseHandler),
