@@ -5,9 +5,57 @@
 
 
 	$(document).ready(function(){
+
+		function get_players_name(){
+			vex.dialog.open({
+				message: "What's your name?",
+				
+				input: "<input name=\'player_name\' placeholder='Your name, please.' required />",
+				callback: function(value){
+					// var actor_input = value;
+					// console.log(actor_input);
+					$.ajax({
+					type: 'POST',
+					url: '/getplayer',
+					data: {player_name: value.player_name},
+					// success: function(result){
+					// 	$('#python_response').text(result);
+					// }
+					});
+
+				}
+
+
+			});
+		};
+
+		// function choose_random_actor(){
+		// 	var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
+		// 	var actor_list_length = random_actors.length;
+		// 	var rand_index = Math.floor((Math.random()* actor_list_length));
+		// 	var chosen_actor = random_actors[rand_index];
+		// 	console.log(chosen_actor);
+		// }
+
+
 		vex.dialog.open({
 			message: "Which actor/actress are we searching for?",
-			input: "<input name=\'actor\' id='actor' placeholder='Which actor?' required />",
+			input: "<input name=\'actor\' id='actor_vex' placeholder='Which actor?' required />",
+			buttons: [
+		        // $.extend({}, vex.dialog.buttons.YES, text: 'Login')
+		        $.extend({}, vex.dialog.buttons.YES, {text: "OK"}),
+		        $.extend({}, vex.dialog.buttons.YES, {text: 'Surprise me!', click: function(){
+		        	var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
+					var actor_list_length = random_actors.length;
+					var rand_index = Math.floor((Math.random()* actor_list_length));
+					var chosen_actor = random_actors[rand_index];
+					$('#actor_vex').val(chosen_actor);
+		        }
+		    })
+
+		    ],
+
+
 			callback: function(value){
 				// var actor_input = value;
 				// console.log(actor_input);
@@ -15,9 +63,7 @@
 				type: 'POST',
 				url: '/getactor',
 				data: {actorName: value.actor},
-				// success: function(result){
-				// 	$('#python_response').text(result);
-				// }
+				success: get_players_name(),
 				});
 
 			}
@@ -25,25 +71,7 @@
 
 		});
 
-		vex.dialog.open({
-			message: "What's your name?",
-			input: "<input name=\'player_name\' placeholder='Your name, please.' required />",
-			callback: function(value){
-				// var actor_input = value;
-				// console.log(actor_input);
-				$.ajax({
-				type: 'POST',
-				url: '/getplayer',
-				data: {player_name: value.player_name},
-				// success: function(result){
-				// 	$('#python_response').text(result);
-				// }
-				});
 
-			}
-
-
-		});
 
 		// vex.dialog.open({
 
@@ -97,6 +125,13 @@
 			enable_start_button();
 		});
 
+		$('#random_actor').click(function(){
+			var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
+			var actor_list_length = random_actors.length;
+			var rand_index = Math.floor((Math.random()* actor_list_length));
+			var chosen_actor = random_actors[rand_index];
+			alert(chosen_actor);
+		});
 
 		//show input fields necessary for additonal players
 		$('#moreplayers').click(function(){
