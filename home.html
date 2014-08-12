@@ -9,18 +9,21 @@
 		function get_players_name(){
 			vex.dialog.open({
 				message: "What's your name?",
-				
+				overlayClosesOnClick: false,
+				buttons: [
+					$.extend({}, vex.dialog.buttons.YES, { text: "Start the game!"})
+				],
 				input: "<input name=\'player_name\' placeholder='Your name, please.' required />",
 				callback: function(value){
 					// var actor_input = value;
 					// console.log(actor_input);
 					$.ajax({
 					type: 'POST',
-					url: '/getplayer',
+					url: '/',
 					data: {player_name: value.player_name},
-					// success: function(result){
-					// 	$('#python_response').text(result);
-					// }
+					success: function(result){
+						$('html').html(result);
+					}
 					});
 
 				}
@@ -40,11 +43,12 @@
 
 		vex.dialog.open({
 			message: "Which actor/actress are we searching for?",
+			overlayClosesOnClick: false,
 			input: "<input name=\'actor\' id='actor_vex' placeholder='Which actor?' required />",
 			buttons: [
 		        // $.extend({}, vex.dialog.buttons.YES, text: 'Login')
 		        $.extend({}, vex.dialog.buttons.YES, {text: "OK"}),
-		        $.extend({}, vex.dialog.buttons.YES, {text: 'Surprise me!', click: function(){
+		        $.extend({}, vex.dialog.buttons.NO, {text: 'Surprise me!', click: function(){
 		        	var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
 					var actor_list_length = random_actors.length;
 					var rand_index = Math.floor((Math.random()* actor_list_length));
@@ -229,31 +233,16 @@
 	
 {% block content %}
 
-	<form action='/'>
-	
-	<playerTitle><b>Player List</b></playerTitle>
-	<input type='button' name='moreplayers' id='moreplayers' value='More players?'>
-	<input type='text' name='num_players' id='num_players' placeholder='How many players in total?'><br>
-	<div class='players'>
-	<br><input name='player1' id='player1' placeholder='Enter name of player 1'/>
-	<div id='more_players'></div>
-	</div>
-	<input type='button' name='print_now' id='print_now' value="Print player names."><br>
-	<div id="playerInfo"></div></br><br><br>
-	</form>	
-	
-	<div id='num_player'></div>
-	
+Rules of the game: We'll present you a number of films from your chosen actor, each with a little bit of information. You need to guess what percentage of film reviews on Rottentomatoes.com are positive for this film. Every percentage point you are above or below the actual score, you recieve a penalty point. At the end of the game, the one with the least amount of penalties, wins.
 
-	<actor><b>Choose an actor</b><actor>
-	<!-- <input type='button' name='surprise' id='surprise' value='Surprise me!'><br><br> -->
-	<input name='actor' id='actor' placeholder='Which actor?'><br>
-	<!-- <input type="button" id='print_entered_actor' value="Print actor's name."><br> -->
-	<input type='button' id='get_entered_actor' value='Look up actor.'>
-	<div id='python_response'></div>
-	<!-- <div id='print_actor' name='print_actor'>  </div> <br><br><br> -->
-	<form action='/game' method='GET'>
-	<input type='submit' id='start_game' value="Let's start the game!" disabled=true>
-	</form>
+<div id="game_content">
+
+
+	{{movie_info}}
+
+
+</div>
+
 {% end %}
+
 
