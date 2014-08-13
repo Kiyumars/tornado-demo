@@ -27,6 +27,21 @@
 			});
 		};
 
+		$(document.body).on("click", "#another_movie", function(){
+			$.ajax({
+				type: "POST",
+				url: '/nextround',
+				success: function(result){
+					$('#game_content').html(result);
+
+				}
+			});
+		});
+
+
+	
+
+
 
 		vex.dialog.open({
 			message: "Which actor/actress are we searching for?",

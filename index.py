@@ -124,8 +124,11 @@ def print_movie_info(movie, critics_score, audience_score):
 	
 	critics_html = "Critics Rating: " + str(critics_score) + " <br>"
 	audience_html = "Audience Rating: " + str(audience_score) + " <br>"
+	game_content_html += "<div id='ratings'>"
 	game_content_html += critics_html
 	game_content_html += audience_html
+	game_content_html += "</div>"
+
 	
 	print "In print_movie_info, game_content_html is "
 	print game_content_html
@@ -161,9 +164,17 @@ class ActorHandler(tornado.web.RequestHandler):
 		print "Finished movie list"
 
 
+class RoundHandler(tornado.web.RequestHandler):
+	def post(self):
+		movie_info = get_one_movie()
+		print "This is the RoundHandler: "
+		print movie_info
+		self.render("game_round.html", title='title', movie_info=movie_info, player_name="")
+
 application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/getactor", ActorHandler),
+										(r"/nextround", RoundHandler)
 										],
 										static_path="static")
 
