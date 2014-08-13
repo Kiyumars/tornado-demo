@@ -8,7 +8,7 @@
 				buttons: [
 					$.extend({}, vex.dialog.buttons.YES, { text: "Start the game!"})
 				],
-				input: "<input name=\'player_name\' placeholder='Your name, please.' required />",
+				input: "<input name=\'player_name\' placeholder='Your name, please.' required autofocus/>",
 				callback: function(value){
 					// var actor_input = value;
 					// console.log(actor_input);
@@ -31,7 +31,7 @@
 		vex.dialog.open({
 			message: "Which actor/actress are we searching for?",
 			overlayClosesOnClick: false,
-			input: "<input name=\'actor\' id='actor_vex' placeholder='Which actor?' required />",
+			input: "<input name=\'actor\' id='actor_vex' placeholder='Which actor?' required  autofocus/>",
 			buttons: [
 		        // $.extend({}, vex.dialog.buttons.YES, text: 'Login')
 		        $.extend({}, vex.dialog.buttons.YES, {text: "OK"}),

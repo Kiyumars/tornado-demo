@@ -20,15 +20,21 @@ PLAYER = ""
 def get_released_movies(actor):
 	"""only include movies before current year, to exclude unreleased films"""
 	movie_list = []
-	for movie in actor['actor']:
-		try:
-			if movie['year'] >= 2014:
+	
+	try:
+		for movie in actor['actor']:			
+			if 'year' not in movie.keys() or movie['year'] >= 2014:
 				continue
 			else:
 				movie_list.append(movie)
-		#some movies don't have year values. Perhaps find another way to handle error
-		except KeyError:
-			continue
+			#some movies don't have year values. Perhaps find another way to handle error
+	except KeyError:
+		for movie in actor['actress']:
+			if 'year' not in movie.keys() or movie['year'] >= 2014:
+					continue
+			else:
+				movie_list.append(movie)
+
 
 	return movie_list
 
@@ -110,7 +116,7 @@ def print_movie_info(movie, critics_score, audience_score):
 
 	for movie_key in possible_info:
 		if movie_key in movie.keys():
-			info_html = str(movie_key) + ": " + str(movie[movie_key]) + "<br>"
+			info_html = str(movie_key.title()) + ": " + str(movie[movie_key]) + "<br><br>"
 			game_content_html += info_html
 	print game_content_html
 	
