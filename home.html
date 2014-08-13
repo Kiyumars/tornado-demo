@@ -12,10 +12,10 @@
 Rules of the game: We'll present you a number of films from your chosen actor, each with a little bit of information. You need to guess what percentage of film reviews on Rottentomatoes.com are positive for this film. Every percentage point you are above or below the actual score, you recieve a penalty point. At the end of the game, the one with the least amount of penalties, wins.
 
 <div id="game_content">
+{{ player_name }} <br><br>
 
-{% for movie in movie_info %}
-	{{ movie }} <br>
-{% end %}
+{% raw movie_info %} <br>
+
 
 </div>
 
