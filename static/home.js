@@ -38,7 +38,10 @@
 			});
 		});
 
-
+		$(document.body).on("click", "#reveal_ratings", function(){
+			$('#ratings').show();
+			$("#reveal_ratings").hide();
+		});
 	
 
 
