@@ -41,11 +41,13 @@ def get_released_movies(actor):
 
 def get_one_movie():
 	"""Pick movie for the coming round if movie has reviews"""
+	# global MOVIE_LIST
 	movie_choice = MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
 	has_reviews = reviews_exist(movie_choice.movieID)
 	
 	if not has_reviews:
-		get_one_movie()
+		print "One movie did not have enough reviews."
+		return get_one_movie()
 	else:
 		update_movie_info(movie_choice)
 		movie_info = start_new_round(movie_choice)
@@ -136,15 +138,17 @@ class MainHandler(tornado.web.RequestHandler):
 
 	def post(self):
 		global MOVIE_LIST
-		player_name = self.get_argument('player_name')
-		print player_name
+		actor_name = self.get_argument('actorName')
+		actor_object = imd.search_person(actor_name)[0]
+		imd.update(actor_object)
+		MOVIE_LIST = get_released_movies(actor_object)
 		movie_info = get_one_movie()
 
-		print "Something is happening here: "
+		print "Something is happening here in MainHandler: "
 		print movie_info
 		print type(movie_info)
 		# import pdb; pdb.set_trace()
-		self.render("home.html", title='title',  movie_info=movie_info, player_name=player_name)
+		self.render("game_round.html", title='title',  movie_info=movie_info, player_name="")
 
 
 class ActorHandler(tornado.web.RequestHandler):

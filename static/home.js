@@ -52,9 +52,11 @@
 				// console.log(actor_input);
 				$.ajax({
 				type: 'POST',
-				url: '/getactor',
+				url: '/',
 				data: {actorName: value.actor},
-				success: get_players_name(),
+				success: function(result){
+						$('#game_content').html(result);
+					}
 				});
 
 			}
