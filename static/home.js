@@ -42,6 +42,11 @@
 			$('#ratings').show();
 			$("#reveal_ratings").hide();
 		});
+
+		$(document.body).on('click', "#reveal_plot", function(){
+			$("#entire_plot").show();
+			$("#reveal_plot").hide();
+		})
 	
 
 
