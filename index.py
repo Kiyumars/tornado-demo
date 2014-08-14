@@ -105,7 +105,7 @@ def print_movie_info(movie, critics_score, audience_score):
 	game_content_html = ''
 
 	if 'title' in movie.keys():
-		game_content_html += "<movie_info>Title: " + str(movie['title']) + " </movie_info><br><br>"
+		game_content_html += "<movie_info><h3>Title: " + str(movie['title']) + " </h3></movie_info><br><br>"
 	if 'year' in movie.keys():
 		game_content_html += "<movie_info>Released in " + str(movie['year']) + "</movie_info><br><br>"
 	if 'director' in movie.keys():
@@ -118,21 +118,25 @@ def print_movie_info(movie, critics_score, audience_score):
 		game_content_html += "</movie_info><br><br>"
 	if "plot outline" in movie.keys():
 		game_content_html += "Plot outline: " + movie['plot outline'].decode("utf-8") + "<br><br>"
-	if "full-size cover url" in movie.keys():
-		game_content_html += "Poster: <a href='" + movie['full-size cover url'] + "' target='_blank'> Click here</a><br><br>" 
 
-	# for movie_key in possible_info:
-	# 	if movie_key in movie.keys():
-	# 		info_html = str(movie_key.title()) + ": " + str(movie[movie_key]) + "<br><br>"
-	# 		game_content_html += info_html
-	# print game_content_html
-	
 	critics_html = "Critics Rating: " + str(critics_score) + " <br>"
 	audience_html = "Audience Rating: " + str(audience_score) + " <br>"
 	game_content_html += "<div id='ratings'>"
 	game_content_html += critics_html
 	game_content_html += audience_html
 	game_content_html += "</div>"
+	game_content_html += "<h3>Extra Hints</h3>"
+
+	if "full-size cover url" in movie.keys():
+		game_content_html += "Poster: <a href='" + movie['full-size cover url'] + "' target='_blank'> Click here</a><br><br>" 
+	if "plot" in movie.keys():
+		game_content_html += "Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'>" + movie['plot'][0].decode('utf-8') + "</div>"
+
+	# for movie_key in possible_info:
+	# 	if movie_key in movie.keys():
+	# 		info_html = str(movie_key.title()) + ": " + str(movie[movie_key]) + "<br><br>"
+	# 		game_content_html += info_html
+	# print game_content_html
 
 	
 	print "In print_movie_info, game_content_html is "
