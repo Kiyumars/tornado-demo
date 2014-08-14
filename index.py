@@ -43,26 +43,26 @@ def get_one_movie():
 	"""Pick movie for the coming round if movie has reviews"""
 	# global MOVIE_LIST
 	movie_choice = MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
-	has_reviews = reviews_exist(movie_choice.movieID)
+	has_reviews, critics, audience = reviews_exist(movie_choice.movieID)
 	
 	if not has_reviews:
 		print "One movie did not have enough reviews."
 		return get_one_movie()
 	else:
 		update_movie_info(movie_choice)
-		movie_info = start_new_round(movie_choice)
+		# movie_info = start_new_round(movie_choice)
+		# critics, audience = request_rt_ratings(movie_choice.movieID)
 		print "get_one_movie function, movie_info is: "
-		print movie_info
-		return movie_info
+		return movie_choice, critics, audience
 
 
 def reviews_exist(movieID):
 	"""remove movies that have no reviews or just one positive review on RT.com"""
 	critics, audience = request_rt_ratings(movieID)
 	if critics < 0 or critics == 100 or not critics:
-		return False
+		return False, False, False
 	else:
-		return True
+		return True, critics, audience
 
 
 def start_new_round(movie_choice):
@@ -148,7 +148,7 @@ def print_movie_info(movie, critics_score, audience_score):
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.render("home.html", title='title',  movie_info=[], player_name='')
+		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
 
 	def post(self):
 		global MOVIE_LIST
@@ -156,13 +156,13 @@ class MainHandler(tornado.web.RequestHandler):
 		actor_object = imd.search_person(actor_name)[0]
 		imd.update(actor_object)
 		MOVIE_LIST = get_released_movies(actor_object)
-		movie_info = get_one_movie()
+		movie, critics_score, audience_score = get_one_movie()
 
 		print "Something is happening here in MainHandler: "
-		print movie_info
-		print type(movie_info)
+		# print movie_info
+		# print type(movie_info)
 		# import pdb; pdb.set_trace()
-		self.render("game_round.html", title='title',  movie_info=movie_info, player_name="")
+		self.render("game_round.html", title='title',  movie=movie, critics_score=critics_score, audience_score= audience_score)
 
 
 class ActorHandler(tornado.web.RequestHandler):
@@ -177,10 +177,10 @@ class ActorHandler(tornado.web.RequestHandler):
 
 class RoundHandler(tornado.web.RequestHandler):
 	def post(self):
-		movie_info = get_one_movie()
+		movie, critics_score, audience_score = get_one_movie()
 		print "This is the RoundHandler: "
-		print movie_info
-		self.render("game_round.html", title='title', movie_info=movie_info, player_name="")
+		print movie
+		self.render("game_round.html", title='title', movie=movie, critics_score=critics_score, audience_score= audience_score)
 
 application = tornado.web.Application([
 										(r"/", MainHandler),
@@ -193,6 +193,7 @@ if __name__ == "__main__":
 	application.listen(8888)
 	tornado.autoreload.start()
 	tornado.autoreload.watch('home.html')
+	tornado.autoreload.watch('game_round.html')
 	tornado.autoreload.watch('static/')
 	# tornado.autoreload.watch('static/home.js')
 	tornado.ioloop.IOLoop.instance().start()

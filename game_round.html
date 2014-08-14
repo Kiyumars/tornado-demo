@@ -1,5 +1,35 @@
 <br><br>
 
-{% raw movie_info %} <br>
 
+		 <movie_info><h3>Title:   {{movie['title']}} </h3></movie_info>
+
+	<movie_info>Released in {{movie['year']}} </movie_info><br><br>
+	<movie_info>Director: {{movie['director'][0]}} </movie_info><br><br>
+	{% if movie['cast'][:5] %}
+	Cast: {% for cast in movie['cast'][:5] %} {{str(cast)}}, {% end %} 
+	{% end %} 
+	<br><br>
+	Plot outline: {{movie['plot outline']}} <br>
+	<button id='reveal_ratings'>Reveal ratings</button><br><br>
+	<div id='ratings'>
+	Critics ratings score: {{ critics_score}} <br>
+	Audience ratings score: {{ audience_score }}<br>
+	</div>
+	<button id='another_movie'>Another movie</button>
+
+	<h4>Extra Hints</h4>
+
+	Poster: <a href='{{movie["full-size cover url"]}}' target='_blank'> Click here</a><br><br>
+	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot'][0]}} </div>
+
+
+<!-- 
+	if "cast" in movie.keys():
+		game_content_html += "<movie_info>Cast: "
+		for cast in movie['cast'][:5]:
+			game_content_html += str(cast) + ", "
+			# print cast
+		game_content_html += "</movie_info><br><br>"
+	if "plot outline" in movie.keys():
+		game_content_html += "Plot outline: " + movie['plot outline'].decode("utf-8") + "<br><br> -->
 
