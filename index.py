@@ -72,19 +72,7 @@ def start_new_round(movie_choice):
 	print movie_info
 
 	return movie_info
-	# get_and_calc_player_guesses(critics, movie_choice)
 
-	#only start bonus round if critics score and audience score differ, otherwise
-	#update player scores and ask to start a new round.
-	# if critics != audience:	
-	# 	start_bonus_round(critics, audience)	
-	# elif critics == audience:
-	# 	for player in player_scores:
-	# 		player_scores[player] += player_guesses[player]
-	# 		print player_names[player] + " now has a total score of " + str(player_scores[player]) + " points.\n"
-	# 		want_another_round()
-	# else:
-	# 	print "Something went wrong with the start_bonus_round function."
 
 
 def update_movie_info(movie):
@@ -116,11 +104,28 @@ def print_movie_info(movie, critics_score, audience_score):
 	possible_info = ['title', 'year', 'plot outline','full-size cover url']
 	game_content_html = ''
 
-	for movie_key in possible_info:
-		if movie_key in movie.keys():
-			info_html = str(movie_key.title()) + ": " + str(movie[movie_key]) + "<br><br>"
-			game_content_html += info_html
-	print game_content_html
+	if 'title' in movie.keys():
+		game_content_html += "<movie_info>Title: " + str(movie['title']) + " </movie_info><br><br>"
+	if 'year' in movie.keys():
+		game_content_html += "<movie_info>Released in " + str(movie['year']) + "</movie_info><br><br>"
+	if 'director' in movie.keys():
+		game_content_html += "<movie_info>Director: " + str(movie['director'][0])+ "</movie_info><br><br>"
+	if "cast" in movie.keys():
+		game_content_html += "<movie_info>Cast: "
+		for cast in movie['cast'][:5]:
+			game_content_html += str(cast) + ", "
+			# print cast
+		game_content_html += "</movie_info><br><br>"
+	if "plot outline" in movie.keys():
+		game_content_html += "Plot outline: " + movie['plot outline'].decode("utf-8") + "<br><br>"
+	if "full-size cover url" in movie.keys():
+		game_content_html += "Poster: <a href='" + movie['full-size cover url'] + "' target='_blank'> Click here</a><br><br>" 
+
+	# for movie_key in possible_info:
+	# 	if movie_key in movie.keys():
+	# 		info_html = str(movie_key.title()) + ": " + str(movie[movie_key]) + "<br><br>"
+	# 		game_content_html += info_html
+	# print game_content_html
 	
 	critics_html = "Critics Rating: " + str(critics_score) + " <br>"
 	audience_html = "Audience Rating: " + str(audience_score) + " <br>"
