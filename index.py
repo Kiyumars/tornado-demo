@@ -105,7 +105,7 @@ def print_movie_info(movie, critics_score, audience_score):
 	game_content_html = ''
 
 	if 'title' in movie.keys():
-		game_content_html += "<movie_info><h3>Title: " + str(movie['title']) + " </h3></movie_info><br><br>"
+		game_content_html += "<movie_info><h3>Title: " + str(movie['title']) + " </h3></movie_info>"
 	if 'year' in movie.keys():
 		game_content_html += "<movie_info>Released in " + str(movie['year']) + "</movie_info><br><br>"
 	if 'director' in movie.keys():
@@ -119,13 +119,15 @@ def print_movie_info(movie, critics_score, audience_score):
 	if "plot outline" in movie.keys():
 		game_content_html += "Plot outline: " + movie['plot outline'].decode("utf-8") + "<br><br>"
 
+	game_content_html += "<button id='reveal_ratings'>Reveal ratings</button><br><br><button id='another_movie'>Another movie</button>"
+
 	critics_html = "Critics Rating: " + str(critics_score) + " <br>"
 	audience_html = "Audience Rating: " + str(audience_score) + " <br>"
 	game_content_html += "<div id='ratings'>"
 	game_content_html += critics_html
 	game_content_html += audience_html
 	game_content_html += "</div>"
-	game_content_html += "<h3>Extra Hints</h3>"
+	game_content_html += "<h4>Extra Hints</h4>"
 
 	if "full-size cover url" in movie.keys():
 		game_content_html += "Poster: <a href='" + movie['full-size cover url'] + "' target='_blank'> Click here</a><br><br>" 
@@ -191,5 +193,6 @@ if __name__ == "__main__":
 	application.listen(8888)
 	tornado.autoreload.start()
 	tornado.autoreload.watch('home.html')
+	tornado.autoreload.watch('static/')
 	# tornado.autoreload.watch('static/home.js')
 	tornado.ioloop.IOLoop.instance().start()
