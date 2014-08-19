@@ -22,14 +22,3 @@
 	Poster: <a href='{{movie["full-size cover url"]}}' target='_blank'> Click here</a><br><br>
 	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot'][0]}} </div>
 
-
-<!-- 
-	if "cast" in movie.keys():
-		game_content_html += "<movie_info>Cast: "
-		for cast in movie['cast'][:5]:
-			game_content_html += str(cast) + ", "
-			# print cast
-		game_content_html += "</movie_info><br><br>"
-	if "plot outline" in movie.keys():
-		game_content_html += "Plot outline: " + movie['plot outline'].decode("utf-8") + "<br><br> -->
-
