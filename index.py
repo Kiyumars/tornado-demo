@@ -10,9 +10,13 @@ import tornado.autoreload
 
 from rottentomatoes import RT
 import imdb
+from pymongo import MongoClient
 
 imd = imdb.IMDb()
 rt = RT()
+client = MongoClient()
+db = client.mydb
+
 MOVIE_LIST = None
 # PLAYERS = {}
 PLAYER = ""
@@ -46,13 +50,9 @@ def get_one_movie():
 	has_reviews, critics, audience = reviews_exist(movie_choice.movieID)
 	
 	if not has_reviews:
-		print "One movie did not have enough reviews."
 		return get_one_movie()
 	else:
 		update_movie_info(movie_choice)
-		# movie_info = start_new_round(movie_choice)
-		# critics, audience = request_rt_ratings(movie_choice.movieID)
-		print "get_one_movie function, movie_info is: "
 		return movie_choice, critics, audience
 
 
@@ -68,11 +68,8 @@ def reviews_exist(movieID):
 def start_new_round(movie_choice):
 	critics, audience = request_rt_ratings(movie_choice.movieID)
 	movie_info = print_movie_info(movie_choice, critics, audience)
-	print "In start_new_round function, movie_info is "
-	print movie_info
 
 	return movie_info
-
 
 
 def update_movie_info(movie):
@@ -100,6 +97,7 @@ def parse_json(json_data):
 		return False, False
 
 
+
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
@@ -107,34 +105,77 @@ class MainHandler(tornado.web.RequestHandler):
 	def post(self):
 		global MOVIE_LIST
 		actor_name = self.get_argument('actorName')
+		actor_in_db(actor_name)
+
 		actor_object = imd.search_person(actor_name)[0]
 		imd.update(actor_object)
+
 		MOVIE_LIST = get_released_movies(actor_object)
 		movie, critics_score, audience_score = get_one_movie()
 
-		print "Something is happening here in MainHandler: "
-		# print movie_info
-		# print type(movie_info)
-		# import pdb; pdb.set_trace()
 		self.render("game_round.html", title='title',  movie=movie, critics_score=critics_score, audience_score= audience_score)
+
+
+def actor_in_db(actor_name):
+	split_name = actor_name.split(' ')
+	print split_name
+	actor_query = db.actors.find({'Last Name': str(split_name[1])}, {'IMDb PersonID': 1, '_id': 0})
+	print actor_query[0]['IMDb PersonID']
+
 
 
 class ActorHandler(tornado.web.RequestHandler):
 	def post(self):
 		global MOVIE_LIST
 		actor_name = self.get_argument('actorName')
+		actor_in_db(actor_name)
+
 		actor_object = imd.search_person(actor_name)[0]
 		imd.update(actor_object)
 		MOVIE_LIST = get_released_movies(actor_object)
-		print "Finished movie list"
+	
 
 
 class RoundHandler(tornado.web.RequestHandler):
 	def post(self):
 		movie, critics_score, audience_score = get_one_movie()
-		print "This is the RoundHandler: "
-		print movie
 		self.render("game_round.html", title='title', movie=movie, critics_score=critics_score, audience_score= audience_score)
+
+
+class MovieObject():
+	def __init__(self, MovieID, title, year, director, cast, plot_outline, plot, critics_score, audience_score):
+		self.MovieID = MovieID
+		self.title = title
+		self.year = year
+		self.director = director
+		self.cast = cast
+		self.plot_outline = plot_outline
+		self.plot = plot
+		self.critics_score = critics_score
+		self.audience_score = audience_score
+
+
+class ActorObject():
+	def __init__(self, PersonID, lname, fname, birth):
+		self.PersonID = PersonID
+		self.lname = lname
+		self.fname = fname
+		self.birth = birth
+		# self.filmography = filmography
+		# self.death = death
+		# self.bio = bio
+
+
+def test_save_actorObject(actor):
+	split_name = actor['canonical name'].split(",")
+	db.actors.insert({
+						"IMDb PersonID": actor.personID, 
+						"Last Name": split_name[0],
+						"First Name": split_name[1],
+						"Birth year": actor['birth date']
+
+						})
+
 
 application = tornado.web.Application([
 										(r"/", MainHandler),
@@ -142,10 +183,9 @@ application = tornado.web.Application([
 										(r"/nextround", RoundHandler)
 										],
 										static_path="static",
-										autoreload='True')
+										autoreload=True)
 
 if __name__ == "__main__":
 	application.listen(8888)
 	tornado.autoreload.start()
-	print "And now?"
 	tornado.ioloop.IOLoop.instance().start()
