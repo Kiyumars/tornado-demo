@@ -100,52 +100,6 @@ def parse_json(json_data):
 		return False, False
 
 
-def print_movie_info(movie, critics_score, audience_score):
-	possible_info = ['title', 'year', 'plot outline','full-size cover url']
-	game_content_html = ''
-
-	if 'title' in movie.keys():
-		game_content_html += "<movie_info><h3>Title: " + str(movie['title']) + " </h3></movie_info>"
-	if 'year' in movie.keys():
-		game_content_html += "<movie_info>Released in " + str(movie['year']) + "</movie_info><br><br>"
-	if 'director' in movie.keys():
-		game_content_html += "<movie_info>Director: " + str(movie['director'][0])+ "</movie_info><br><br>"
-	if "cast" in movie.keys():
-		game_content_html += "<movie_info>Cast: "
-		for cast in movie['cast'][:5]:
-			game_content_html += str(cast) + ", "
-			# print cast
-		game_content_html += "</movie_info><br><br>"
-	if "plot outline" in movie.keys():
-		game_content_html += "Plot outline: " + movie['plot outline'].decode("utf-8") + "<br><br>"
-
-	game_content_html += "<button id='reveal_ratings'>Reveal ratings</button><br><br><button id='another_movie'>Another movie</button>"
-
-	critics_html = "Critics Rating: " + str(critics_score) + " <br>"
-	audience_html = "Audience Rating: " + str(audience_score) + " <br>"
-	game_content_html += "<div id='ratings'>"
-	game_content_html += critics_html
-	game_content_html += audience_html
-	game_content_html += "</div>"
-	game_content_html += "<h4>Extra Hints</h4>"
-
-	if "full-size cover url" in movie.keys():
-		game_content_html += "Poster: <a href='" + movie['full-size cover url'] + "' target='_blank'> Click here</a><br><br>" 
-	if "plot" in movie.keys():
-		game_content_html += "Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'>" + movie['plot'][0].decode('utf-8') + "</div>"
-
-	# for movie_key in possible_info:
-	# 	if movie_key in movie.keys():
-	# 		info_html = str(movie_key.title()) + ": " + str(movie[movie_key]) + "<br><br>"
-	# 		game_content_html += info_html
-	# print game_content_html
-
-	
-	print "In print_movie_info, game_content_html is "
-	print game_content_html
-	return game_content_html
-
-
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
@@ -187,13 +141,11 @@ application = tornado.web.Application([
 										(r"/getactor", ActorHandler),
 										(r"/nextround", RoundHandler)
 										],
-										static_path="static")
+										static_path="static",
+										autoreload='True')
 
 if __name__ == "__main__":
 	application.listen(8888)
 	tornado.autoreload.start()
-	tornado.autoreload.watch('home.html')
-	tornado.autoreload.watch('game_round.html')
-	tornado.autoreload.watch('static/')
-	# tornado.autoreload.watch('static/home.js')
+	print "And now?"
 	tornado.ioloop.IOLoop.instance().start()
