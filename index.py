@@ -39,13 +39,12 @@ def get_released_movies(actor):
 			else:
 				movie_list.append(movie)
 
-
 	return movie_list
 
 
 def get_one_movie():
 	"""Pick movie for the coming round if movie has reviews"""
-	# global MOVIE_LIST
+	# refactor this function, no globals
 	movie_choice = MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
 	has_reviews, critics, audience = reviews_exist(movie_choice.movieID)
 	
@@ -105,7 +104,13 @@ class MainHandler(tornado.web.RequestHandler):
 	def post(self):
 		global MOVIE_LIST
 		actor_name = self.get_argument('actorName')
+		
 		actor_in_db(actor_name)
+		#if actor_in_db(actor_name):
+		#	var1 = search_on_mongo(actor_name)
+		#else:
+		#	var1 = search_info_on_imdb(actor_name):
+		#
 
 		actor_object = imd.search_person(actor_name)[0]
 		imd.update(actor_object)
@@ -116,12 +121,51 @@ class MainHandler(tornado.web.RequestHandler):
 		self.render("game_round.html", title='title',  movie=movie, critics_score=critics_score, audience_score= audience_score)
 
 
+def search_info_on_imdb(actor_name):
+	actor_object = imd.search_person(actor_name)[0]
+	imd.update(actor_object)
+	MOVIE_LIST = get_released_movies(actor_object)
+	movie, critics_score, audience_score = get_one_movie()
+
+	return movie, critics_score, audience_score
+
+
 def actor_in_db(actor_name):
 	split_name = actor_name.split(' ')
-	print split_name
-	actor_query = db.actors.find({'Last Name': str(split_name[1])}, {'IMDb PersonID': 1, '_id': 0})
-	print actor_query[0]['IMDb PersonID']
+	number_actors_in_db = db.actors.find({'Last Name': str(split_name[1])}, {'IMDb PersonID': 1, '_id': 0}).count()
+ 
+ 	return True if number_actors_in_db > 0 else False
 
+
+def enter_filmography(actor_id, filmography, critics_score, audience_score):
+	for movie in filmography:
+		db.actor_filmography.insert({
+									"actor_id": actor_id,
+									"movie_id": movie['id']
+									})
+	for movie in filmography:
+		if not movie_in_db():
+			db.movie_id.insert({"IMDb id": movie.movieID,
+								"title": movie["title"],
+								"Release": movie['year'],
+								"Plot outline": movie['plot outline'],
+								"Full Plot": movie['plot'],
+								"Poster": movie["full-size cover url"],
+								"RT Critics Score": critics_score,
+								"RT Audience Score": audience_score
+
+								})
+
+
+
+def movie_in_db(movieID):
+	movie_found = db.movie_id.find_one({ "IMDb id": movieID })
+	if movie_found:
+		return True
+	elif not movie_found:
+		return False
+	else:
+		print "Something went wrong in function movie_in_db."
 
 
 class ActorHandler(tornado.web.RequestHandler):
@@ -142,7 +186,7 @@ class RoundHandler(tornado.web.RequestHandler):
 		self.render("game_round.html", title='title', movie=movie, critics_score=critics_score, audience_score= audience_score)
 
 
-class MovieObject():
+class Movie():
 	def __init__(self, MovieID, title, year, director, cast, plot_outline, plot, critics_score, audience_score):
 		self.MovieID = MovieID
 		self.title = title
@@ -155,7 +199,7 @@ class MovieObject():
 		self.audience_score = audience_score
 
 
-class ActorObject():
+class Actor():
 	def __init__(self, PersonID, lname, fname, birth):
 		self.PersonID = PersonID
 		self.lname = lname
@@ -183,7 +227,7 @@ application = tornado.web.Application([
 										(r"/nextround", RoundHandler)
 										],
 										static_path="static",
-										autoreload=True)
+										debug=True)
 
 if __name__ == "__main__":
 	application.listen(8888)
