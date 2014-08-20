@@ -17,9 +17,146 @@ rt = RT()
 client = MongoClient()
 db = client.mydb
 
-MOVIE_LIST = None
+MOVIE_LIST = []
 # PLAYERS = {}
 PLAYER = ""
+
+
+class MainHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
+
+	def post(self):
+		global MOVIE_LIST
+		actor_name = self.get_argument('actorName')
+		print actor_name
+		
+		# actor_id = actor_in_db(actor_name)
+		
+		if actor_in_db(actor_name):
+			print "Found actor in database. Yay."
+			# movie_id_list = search_movieIDs_on_mongo(actor_id)
+			# for movieID in movie_id_list:
+			# 	global MOVIE_LIST
+			# 	movieObject = Movie(MovieID)
+			# 	MOVIE_LIST.append(movieObject)
+			# movie= MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
+			# critics_score = movie.critics_score
+			# audience_score = movie.audience_score
+			# self.render("game_round.html", title='title',  movie=movie,
+			# 		 critics_score=critics_score, audience_score=audience_score)
+		else:
+			print "Didn't find actor in database. Booh"
+			actorObject = search_info_on_imdb(actor_name)
+			movie, critics_score, audience_score = get_one_movie()
+			self.render("game_round.html", title='title',  movie=movie,
+					 critics_score=critics_score, audience_score=audience_score)
+			enter_actor_in_db(actorObject)
+
+		# actor_object = imd.search_person(actor_name)[0]
+		# imd.update(actor_object)
+
+		# MOVIE_LIST = get_released_movies(actor_object)
+		# movie, critics_score, audience_score = get_one_movie()
+
+
+
+def search_movieIDs_on_mongodb(actor_id):
+	# movie_info = []
+	movie_ids = []
+
+	movies_with_actor = db.movie_list.find({'PersonID': actor_id}, {'MovieID': 1, '_id': 0 })
+	for entry in movies_with_actor:
+		movie_ids.append(entry['MovieID'])
+
+	return movie_ids
+
+	# for movieID in movie_ids:
+	# 	movie_entry = db.movie_list.find({'MovieID': movieID})
+	# 	movie_info.append(movie_entry)
+
+
+def actor_in_db(actor_name):
+	actor_PersonID = False
+	split_name = actor_name.split(' ')
+	print split_name
+
+	number_actors_in_db = db.actors.find({ "$and": [{'Last Name': split_name[1]},{'First Name': split_name[0]} ] }).count() 
+	print number_actors_in_db	
+ 	
+ 	if number_actors_in_db > 0:
+ 		return True
+ 		# actor_search = db.actors.find({'Last Name': str(split_name[1]), 
+			# 								'First Name': str(split_name[0])} , 
+			# 								{'PersonID': 1, '_id': 0})
+ 		# for actor in actor_search:
+			# actor_personID = actor['PersonID']
+ 		# return True, actor_personID
+ 	else:
+ 		# return False, False
+ 		return False
+
+
+def search_info_on_imdb(actor_name):
+	global MOVIE_LIST
+	actor_object = imd.search_person(actor_name)[0]
+	imd.update(actor_object)
+	MOVIE_LIST = get_released_movies(actor_object)
+	# movie, critics_score, audience_score = get_one_movie()
+	# return movie, critics_score, audience_score
+	return actor_object
+
+
+def enter_actor_in_db(actor):
+	global MOVIE_LIST
+	print len(MOVIE_LIST)
+	split_name = actor['canonical name'].split(",")
+	total_movie_dict = []
+
+	for movie in MOVIE_LIST:
+		update_movie_info(movie)
+
+		movie_dict = {'Title': movie['title'], 
+						'Year': movie['year'],
+			 			'Director': str(movie['director'][0]['name']),
+			 			# 'Plot Outline': movie['plot outline'],
+			 			# 'Plot': movie['plot'],
+			 			# 'Poster': movie['full-size cover url']  
+			 			}
+
+		cast = ''
+		for actor in movie['cast'][:5]:
+			cast += actor['name'] + ", "
+		movie_dict['Cast'] = cast
+		total_movie_dict.append( movie_dict)
+		print len(total_movie_dict)
+
+	db.actors.insert({
+						"IMDb PersonID": actor.personID, 
+						"Last Name": split_name[0],
+						"First Name": split_name[1],
+						# "Birth year": actor['birth date'],
+						# "Biography": actor['bio'],
+						"Movies": total_movie_dict
+
+						})
+
+
+class Movie():
+	def __init__(self, MovieID):
+		self.MovieID = MovieID
+		
+		entry_in_mongo = db.movie_info.find({'MovieID': self.movieID})
+		for entry in entry_in_mongo:
+			self.title = entry['Title']
+			self.year = entry['Year']
+			self.director = entry['Director']
+			self.cast = entry['cast']
+			self.plot_outline = entry['plot_outline']
+			self.plot = entry['Plot']
+			self.critics_score = entry['Critics Rating']
+			self.audience_score = entry['Audience Rating']
+
 
 def get_released_movies(actor):
 	"""only include movies before current year, to exclude unreleased films"""
@@ -96,47 +233,6 @@ def parse_json(json_data):
 		return False, False
 
 
-
-class MainHandler(tornado.web.RequestHandler):
-	def get(self):
-		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
-
-	def post(self):
-		global MOVIE_LIST
-		actor_name = self.get_argument('actorName')
-		
-		actor_in_db(actor_name)
-		#if actor_in_db(actor_name):
-		#	var1 = search_on_mongo(actor_name)
-		#else:
-		#	var1 = search_info_on_imdb(actor_name):
-		#
-
-		actor_object = imd.search_person(actor_name)[0]
-		imd.update(actor_object)
-
-		MOVIE_LIST = get_released_movies(actor_object)
-		movie, critics_score, audience_score = get_one_movie()
-
-		self.render("game_round.html", title='title',  movie=movie, critics_score=critics_score, audience_score= audience_score)
-
-
-def search_info_on_imdb(actor_name):
-	actor_object = imd.search_person(actor_name)[0]
-	imd.update(actor_object)
-	MOVIE_LIST = get_released_movies(actor_object)
-	movie, critics_score, audience_score = get_one_movie()
-
-	return movie, critics_score, audience_score
-
-
-def actor_in_db(actor_name):
-	split_name = actor_name.split(' ')
-	number_actors_in_db = db.actors.find({'Last Name': str(split_name[1])}, {'IMDb PersonID': 1, '_id': 0}).count()
- 
- 	return True if number_actors_in_db > 0 else False
-
-
 def enter_filmography(actor_id, filmography, critics_score, audience_score):
 	for movie in filmography:
 		db.actor_filmography.insert({
@@ -179,24 +275,11 @@ class ActorHandler(tornado.web.RequestHandler):
 		MOVIE_LIST = get_released_movies(actor_object)
 	
 
-
 class RoundHandler(tornado.web.RequestHandler):
 	def post(self):
 		movie, critics_score, audience_score = get_one_movie()
-		self.render("game_round.html", title='title', movie=movie, critics_score=critics_score, audience_score= audience_score)
-
-
-class Movie():
-	def __init__(self, MovieID, title, year, director, cast, plot_outline, plot, critics_score, audience_score):
-		self.MovieID = MovieID
-		self.title = title
-		self.year = year
-		self.director = director
-		self.cast = cast
-		self.plot_outline = plot_outline
-		self.plot = plot
-		self.critics_score = critics_score
-		self.audience_score = audience_score
+		self.render("game_round.html", title='title', movie=movie, 
+					critics_score=critics_score, audience_score= audience_score)
 
 
 class Actor():
@@ -210,15 +293,24 @@ class Actor():
 		# self.bio = bio
 
 
-def test_save_actorObject(actor):
-	split_name = actor['canonical name'].split(",")
-	db.actors.insert({
-						"IMDb PersonID": actor.personID, 
-						"Last Name": split_name[0],
-						"First Name": split_name[1],
-						"Birth year": actor['birth date']
 
-						})
+
+def enter_actor_filmography_in_db(actor_id):
+	for movie in MOVIE_LIST:
+		db.actor_filmography.insert({'PersonID': actor_id, "MovieID": movie.movieID})
+
+
+def enter_movies_in_db():
+	for movie in MOVIE_LIST:
+		db.movie_list.insert({'MovieID': movie.movieID,
+								'Title': movie['title'],
+								'Year': movie['year'],
+								'Plot outline': movie['plot outline'],
+								'Plot': movie['plot'],
+								'Director': str(movie['director'][0]),
+								'Poster': movie['full-size cover url']
+								})
+
 
 
 application = tornado.web.Application([
