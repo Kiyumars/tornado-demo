@@ -81,7 +81,8 @@ def actor_in_db(actor_name):
 	split_name = actor_name.split(' ')
 	print split_name
 
-	number_actors_in_db = db.actors.find({ "$and": [{'Last Name': split_name[1]},{'First Name': split_name[0]} ] }).count() 
+	number_actors_in_db = db.actors.find({ "$and": [{'Last Name': split_name [1].strip()},
+													{'First Name': split_name[0].strip()} ] }).count() 
 	print number_actors_in_db	
  	
  	if number_actors_in_db > 0:
@@ -109,7 +110,7 @@ def search_info_on_imdb(actor_name):
 
 def enter_actor_in_db(actor):
 	global MOVIE_LIST
-	print len(MOVIE_LIST)
+	print str(len(MOVIE_LIST)) + " movies in total to enter into database."
 	split_name = actor['canonical name'].split(",")
 	total_movie_dict = []
 
@@ -119,8 +120,8 @@ def enter_actor_in_db(actor):
 		movie_dict = {'Title': movie['title'], 
 						'Year': movie['year'],
 			 			'Director': str(movie['director'][0]['name']),
-			 			# 'Plot Outline': movie['plot outline'],
-			 			# 'Plot': movie['plot'],
+			 			'Plot Outline': movie['plot outline'],
+			 			'Plot': movie['plot'],
 			 			# 'Poster': movie['full-size cover url']  
 			 			}
 
@@ -129,17 +130,18 @@ def enter_actor_in_db(actor):
 			cast += actor['name'] + ", "
 		movie_dict['Cast'] = cast
 		total_movie_dict.append( movie_dict)
-		print len(total_movie_dict)
+		print "Finished " + str(len(total_movie_dict)) + " of " + str(len(MOVIE_LIST)) + " movies."
 
 	db.actors.insert({
 						"IMDb PersonID": actor.personID, 
-						"Last Name": split_name[0],
-						"First Name": split_name[1],
+						"Last Name": split_name[0].strip(),
+						"First Name": split_name[1].strip(),
 						# "Birth year": actor['birth date'],
 						# "Biography": actor['bio'],
 						"Movies": total_movie_dict
 
 						})
+	print "Finished saving all of the movies from this actor/actress."
 
 
 class Movie():
