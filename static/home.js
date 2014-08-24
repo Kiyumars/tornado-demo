@@ -1,31 +1,7 @@
 
 	$(document).ready(function(){
 
-		function get_players_name(){
-			vex.dialog.open({
-				message: "What's your name?",
-				overlayClosesOnClick: false,
-				buttons: [
-					$.extend({}, vex.dialog.buttons.YES, { text: "Start the game!"})
-				],
-				input: "<input name=\'player_name\' placeholder='Your name, please.' required autofocus/>",
-				callback: function(value){
-					// var actor_input = value;
-					// console.log(actor_input);
-					$.ajax({
-					type: 'POST',
-					url: '/',
-					data: {player_name: value.player_name},
-					success: function(result){
-						$('html').html(result);
-					}
-					});
 
-				}
-
-
-			});
-		};
 
 		$(document.body).on("click", "#another_movie", function(){
 			$.ajax({
@@ -47,45 +23,56 @@
 			$("#entire_plot").show();
 			$("#reveal_plot").hide();
 		})
+
+		$("#players").keyup(function(){
+			if($("#actor_entered").val() != ""){
+				$("#start_game").removeAttr('disabled');
+			};
+		});
+
+		$("#actor_entered").keyup(function(){
+			if($("#players").val() != ""){
+				$("#start_game").removeAttr('disabled');
+			};
+		});
 	
 
 
+		// vex.dialog.open({
+		// 	message: "Which actor/actress are we searching for?",
+		// 	overlayClosesOnClick: false,
+		// 	input: "<input name=\'actor\' id='actor_vex' placeholder='Which actor?' required  autofocus/>",
+		// 	buttons: [
+		//         // $.extend({}, vex.dialog.buttons.YES, text: 'Login')
+		//         $.extend({}, vex.dialog.buttons.YES, {text: "OK"}),
+		//         $.extend({}, vex.dialog.buttons.NO, {text: 'Surprise me!', click: function(){
+		//         	var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
+		// 			var actor_list_length = random_actors.length;
+		// 			var rand_index = Math.floor((Math.random()* actor_list_length));
+		// 			var chosen_actor = random_actors[rand_index];
+		// 			$('#actor_vex').val(chosen_actor);
+		//         }
+		//     })
 
-		vex.dialog.open({
-			message: "Which actor/actress are we searching for?",
-			overlayClosesOnClick: false,
-			input: "<input name=\'actor\' id='actor_vex' placeholder='Which actor?' required  autofocus/>",
-			buttons: [
-		        // $.extend({}, vex.dialog.buttons.YES, text: 'Login')
-		        $.extend({}, vex.dialog.buttons.YES, {text: "OK"}),
-		        $.extend({}, vex.dialog.buttons.NO, {text: 'Surprise me!', click: function(){
-		        	var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
-					var actor_list_length = random_actors.length;
-					var rand_index = Math.floor((Math.random()* actor_list_length));
-					var chosen_actor = random_actors[rand_index];
-					$('#actor_vex').val(chosen_actor);
-		        }
-		    })
-
-		    ],
-
-
-			callback: function(value){
-				// var actor_input = value;
-				// console.log(actor_input);
-				$.ajax({
-				type: 'POST',
-				url: '/',
-				data: {actorName: value.actor},
-				success: function(result){
-						$('#game_content').html(result);
-					}
-				});
-
-			}
+		//     ],
 
 
-		});
+		// 	callback: function(value){
+		// 		// var actor_input = value;
+		// 		// console.log(actor_input);
+		// 		$.ajax({
+		// 		type: 'POST',
+		// 		url: '/',
+		// 		data: {actorName: value.actor},
+		// 		success: function(result){
+		// 				$('#game_content').html(result);
+		// 			}
+		// 		});
+
+		// 	}
+
+
+		// });
 
 
 
@@ -111,8 +98,8 @@
 		// 	}
 		// });
 
-		$('#num_players').hide();
-		$('#enter_player_num').hide();
+		// $('#num_players').hide();
+		// $('#enter_player_num').hide();
 
 
 		//only start game if there is at least one player and one actor defined
@@ -126,20 +113,20 @@
 
 
 		//print out actor name on page
-		$('#actor').focusout(function(){
-			var actor_name = $('#actor').val();
-			var actor_entry = actor_name + "<br><br><br>";
-			$('#print_actor').html(actor_entry);
+		// $('#actor').focusout(function(){
+		// 	var actor_name = $('#actor').val();
+		// 	var actor_entry = actor_name + "<br><br><br>";
+		// 	$('#print_actor').html(actor_entry);
 			
-		});
-		$('#actor').keyup(function(){
-			enable_start_button();
-		});
+		// });
+		// $('#actor').keyup(function(){
+		// 	enable_start_button();
+		// });
 
 
-		$('#player1').change(function(){
-			enable_start_button();
-		});
+		// $('#player1').change(function(){
+		// 	enable_start_button();
+		// });
 
 		$('#random_actor').click(function(){
 			var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
@@ -150,11 +137,11 @@
 		});
 
 		//show input fields necessary for additonal players
-		$('#moreplayers').click(function(){
-			$('#enter_player_num').toggle();
-			$('#num_players').toggle();
+		// $('#moreplayers').click(function(){
+		// 	$('#enter_player_num').toggle();
+		// 	$('#num_players').toggle();
 
-		});
+		// });
 
 
 		//Create additonal inputs for more players
@@ -173,29 +160,29 @@
 
 
 		//print out number of players
-		$('#print_now').click(function(){
-			$('#playerInfo').html('');
-			var number_players = $('.players input').length;
-			var player_list = [];
+		// $('#print_now').click(function(){
+		// 	$('#playerInfo').html('');
+		// 	var number_players = $('.players input').length;
+		// 	var player_list = [];
 
-			for(var i=1; i <= number_players; i++){
-				var player_ID = "#player" + String(i);
-				var player_name = String($(player_ID).val());
-				//exclude empty fields
-				if(player_name){
-					player_list.push(player_name);
-				};
-			};
-			//print out player names
-			for(x=0; x < player_list.length; x++){
-				var player_entry = "Player " + String(x + 1) + ": " + player_list[x] + "<br>";
-				$('#playerInfo').append(player_entry);	
-			}; 
-				// console.log(player_entry);
-				// $((playerName).val()).appendTo('#playerInfo');	
+		// 	for(var i=1; i <= number_players; i++){
+		// 		var player_ID = "#player" + String(i);
+		// 		var player_name = String($(player_ID).val());
+		// 		//exclude empty fields
+		// 		if(player_name){
+		// 			player_list.push(player_name);
+		// 		};
+		// 	};
+		// 	//print out player names
+		// 	for(x=0; x < player_list.length; x++){
+		// 		var player_entry = "Player " + String(x + 1) + ": " + player_list[x] + "<br>";
+		// 		$('#playerInfo').append(player_entry);	
+		// 	}; 
+		// 		// console.log(player_entry);
+		// 		// $((playerName).val()).appendTo('#playerInfo');	
 			
-			// $("#playerInfo").html(player_info);
-		});
+		// 	// $("#playerInfo").html(player_info);
+		// });
 
 		//get imdb info through tornado request handler
 		$('#get_entered_actor').click(function(){
@@ -212,24 +199,24 @@
 		});
 
 
-		//Print out a surprise actor
+		//Randomly choose an actor/actress
 		$('#surprise').click(function(){
 			var random_actors = ['Tom Cruise', "Nicolas Cage", "Angelina Jolie", "Chuck Norris", "Meryl Streep"];
 			var actor_list_length = random_actors.length;
 			var rand_index = Math.floor((Math.random()* actor_list_length));
 			var chosen_actor = random_actors[rand_index];
-			$('#print_actor').text(chosen_actor);
+			$('#actor').val(chosen_actor);
 		});
 
-		$('#print_entered_actor').click(function(){
-			var entered_actor = $('#actor').val();
-			if (entered_actor){
-				$('#print_actor').text(entered_actor);
-			}else{
-				$('#print_actor').text("Please enter an actor's name.");
-			};
+		// $('#print_entered_actor').click(function(){
+		// 	var entered_actor = $('#actor').val();
+		// 	if (entered_actor){
+		// 		$('#print_actor').text(entered_actor);
+		// 	}else{
+		// 		$('#print_actor').text("Please enter an actor's name.");
+		// 	};
 
-		});
+		// });
 
 		// $('#start_game').click(function(){
 
