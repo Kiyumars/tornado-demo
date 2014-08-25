@@ -59,14 +59,15 @@ class MainHandler(tornado.web.RequestHandler):
 
 class GameHandler(tornado.web.RequestHandler):
 	def get(self):
-		actor_name = self.get_argument('actor_entered')
-		players_entry = self.get_argument('players')
-		players_list = players_entry.split(',')
-		players = {}
-		for player in players_list:
-			players[player.strip()] = 0
+		# actor_name = self.get_argument('actor_entered')
+		actor_name = "Nicolas Cage"
+		# players_entry = self.get_argument('players')
+		# players_list = players_entry.split(',')
+		players = {"Philip": 0, "Michael": 0}
+		# for player in players_list:
+		# 	players[player.strip()] = 0
 
-		print players
+		# print players
 	
 		game = Game(players)
 		# actor_id = actor_in_db(actor_name)
@@ -88,17 +89,23 @@ class GameHandler(tornado.web.RequestHandler):
 	# 		print "Didn't find actor in database. Booh"
 		
 
-		# actorObject, game.movie_list = search_info_on_imdb(actor_name)
-		# print len(game.movie_list)
-		# movie = game.pop_movie_from_list()
-		# print len(game.movie_list)
-		# print movie
-		# print actorObject
-		print game.players
-		score_update = {'Tom': 34, "Dick": 67, "Harry": 56}
-		game.update_player_scores(score_update)
-		print game.players
-			# 		critics_score, audience_score = self.get_one_movie()
+		actorObject, game.movie_list = search_info_on_imdb(actor_name)
+		print len(game.movie_list)
+		cond = False
+		pop_movie(game)
+		# while not cond:
+		# 	movie = game.pop_movie_from_list()
+		# 	if before_1990(movie):
+		# 		print "Popped a movie before 1990"
+		# 		print movie
+		# 		cond = True
+		# 	else:
+		# 		print "Did not find movie before 1990"
+
+		print len(game.movie_list)
+
+
+	# critics_score, audience_score = self.get_one_movie()
 	# 		self.render("game_round.html", title='title',  movie=movie,
 	# 				 critics_score=critics_score, audience_score=audience_score)
 	# 		enter_actor_in_db(actorObject)
@@ -114,6 +121,45 @@ class GameHandler(tornado.web.RequestHandler):
 # 		movie, critics_score, audience_score = get_one_movie()
 # 		self.render("game_round.html", title='title', movie=movie, 
 # 					critics_score=critics_score, audience_score= audience_score)
+
+def pop_movie(GameObject):
+	cond = False
+	while not cond:
+		movie = GameObject.pop_movie_from_list()
+		if before_1990(movie):
+			print "Popped a movie before 1990"
+			print movie
+			cond = True
+		else:
+			print "Did not find movie before 1990"	
+
+
+def before_1990(movie):
+	if movie['year'] < 1990:
+		return True
+	else:
+		return False
+
+
+def get_released_movies(actor):
+	"""only include movies before current year, to exclude unreleased films"""
+	movie_list = []
+	
+	try:
+		for movie in actor['actor']:			
+			if 'year' not in movie.keys() or movie['year'] >= 2014:
+				continue
+			else:
+				movie_list.append(movie)
+			#some movies don't have year values. Perhaps find another way to handle error
+	except KeyError:
+		for movie in actor['actress']:
+			if 'year' not in movie.keys() or movie['year'] >= 2014:
+					continue
+			else:
+				movie_list.append(movie)
+
+	return movie_list
 
 
 def get_one_movie():
@@ -239,28 +285,6 @@ class Game():
 	def update_player_scores(self, score_update):
 		for player in self.players:
 			self.players[player] += score_update[player] 
-
-
-def get_released_movies(actor):
-	"""only include movies before current year, to exclude unreleased films"""
-	movie_list = []
-	
-	try:
-		for movie in actor['actor']:			
-			if 'year' not in movie.keys() or movie['year'] >= 2014:
-				continue
-			else:
-				movie_list.append(movie)
-			#some movies don't have year values. Perhaps find another way to handle error
-	except KeyError:
-		for movie in actor['actress']:
-			if 'year' not in movie.keys() or movie['year'] >= 2014:
-					continue
-			else:
-				movie_list.append(movie)
-
-	return movie_list
-
 
 # def get_one_movie():
 # 	"""Pick movie for the coming round if movie has reviews"""
