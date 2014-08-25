@@ -7,12 +7,15 @@
 			$.ajax({
 				type: "POST",
 				url: '/game',
+				data: {},
 				success: function(result){
 					$('#game_content').html(result);
 
 				}
 			});
 		});
+
+
 
 		$(document.body).on("click", "#reveal_ratings", function(){
 			$('#ratings').show();
@@ -22,7 +25,22 @@
 		$(document.body).on('click', "#reveal_plot", function(){
 			$("#entire_plot").show();
 			$("#reveal_plot").hide();
-		})
+		});
+
+		$("#start_game").click(function(){
+			var actor_entered = $("#actor_entered").val();
+			var players = $("#players").val();
+
+			$.ajax({
+				type: "POST",
+				url: "/game_test",
+				data: {actor_entered: actor_entered,
+						players: players},
+				success: function(data){
+					$('html').html(data);
+				}
+			});
+		});
 
 		$("#players").keydown(function(){
 			if($("#actor_entered").val().length > 0 && $("#players").val().length > 0){
@@ -35,6 +53,16 @@
 				$("#start_game").removeAttr('disabled');
 			};
 		});
+
+		// $("#start_game").click(function(){
+		// 	$.ajax({
+		// 		type: 'POST',
+		// 		url: '/',
+		// 		data: {actorName: value.actor},
+		// 		success: function(result){
+		// 				$('#game_content').html(result);
+
+		// });
 	
 
 

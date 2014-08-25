@@ -1,0 +1,10 @@
+{% extends base.html %}
+
+<div id="game_content">
+{% for player in players %}
+	{{player}}: {{players[player]}}
+{% end%}
+
+The actor's name is {{actor_name}}.
+</div>
+<input type="hidden" value="{{ game_id }}">

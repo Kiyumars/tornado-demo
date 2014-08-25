@@ -15,7 +15,9 @@
 	Critics ratings score: {{ critics_score}} <br>
 	Audience ratings score: {{ audience_score }}<br>
 	</div>
-	<button id='another_movie'>Another movie</button>
+	<form action="/game" method="POST">
+	<input type='submit' id="another_round" name="another_round">
+	</form>
 
 	<h4>Extra Hints</h4>
 
