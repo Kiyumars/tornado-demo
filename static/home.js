@@ -6,7 +6,7 @@
 		$(document.body).on("click", "#another_movie", function(){
 			$.ajax({
 				type: "POST",
-				url: '/nextround',
+				url: '/game',
 				success: function(result){
 					$('#game_content').html(result);
 
@@ -24,14 +24,14 @@
 			$("#reveal_plot").hide();
 		})
 
-		$("#players").keyup(function(){
-			if($("#actor_entered").val() != ""){
+		$("#players").keydown(function(){
+			if($("#actor_entered").val().length > 0 && $("#players").val().length > 0){
 				$("#start_game").removeAttr('disabled');
 			};
 		});
 
-		$("#actor_entered").keyup(function(){
-			if($("#players").val() != ""){
+		$("#actor_entered").keydown(function(){
+			if ($("#players").val().length > 0 && $("#actor_entered").val().length > 0){
 				$("#start_game").removeAttr('disabled');
 			};
 		});

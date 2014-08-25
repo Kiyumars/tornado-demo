@@ -17,41 +17,38 @@ rt = RT()
 client = MongoClient()
 db = client.mydb
 
-MOVIE_LIST = []
-# PLAYERS = {}
-PLAYER = ""
 
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
 
-	def post(self):
-		global MOVIE_LIST
-		actor_name = self.get_argument('actorName')
-		print actor_name
+	# def post(self):
+	# 	global MOVIE_LIST
+	# 	actor_name = self.get_argument('actor_input')
+	# 	print actor_name
 		
-		# actor_id = actor_in_db(actor_name)
+	# 	# actor_id = actor_in_db(actor_name)
 		
-		if actor_in_db(actor_name):
-			print "Found actor in database. Yay."
-			# movie_id_list = search_movieIDs_on_mongo(actor_id)
-			# for movieID in movie_id_list:
-			# 	global MOVIE_LIST
-			# 	movieObject = Movie(MovieID)
-			# 	MOVIE_LIST.append(movieObject)
-			# movie= MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
-			# critics_score = movie.critics_score
-			# audience_score = movie.audience_score
-			# self.render("game_round.html", title='title',  movie=movie,
-			# 		 critics_score=critics_score, audience_score=audience_score)
-		else:
-			print "Didn't find actor in database. Booh"
-			actorObject = search_info_on_imdb(actor_name)
-			movie, critics_score, audience_score = get_one_movie()
-			self.render("game_round.html", title='title',  movie=movie,
-					 critics_score=critics_score, audience_score=audience_score)
-			enter_actor_in_db(actorObject)
+	# 	if actor_in_db(actor_name):
+	# 		print "Found actor in database. Yay."
+	# 		# movie_id_list = search_movieIDs_on_mongo(actor_id)
+	# 		# for movieID in movie_id_list:
+	# 		# 	global MOVIE_LIST
+	# 		# 	movieObject = Movie(MovieID)
+	# 		# 	MOVIE_LIST.append(movieObject)
+	# 		# movie= MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
+	# 		# critics_score = movie.critics_score
+	# 		# audience_score = movie.audience_score
+	# 		# self.render("game_round.html", title='title',  movie=movie,
+	# 		# 		 critics_score=critics_score, audience_score=audience_score)
+	# 	else:
+	# 		print "Didn't find actor in database. Booh"
+	# 		actorObject = search_info_on_imdb(actor_name)
+	# 		movie, critics_score, audience_score = get_one_movie()
+	# 		self.render("game_round.html", title='title',  movie=movie,
+	# 				 critics_score=critics_score, audience_score=audience_score)
+	# 		enter_actor_in_db(actorObject)
 
 		# actor_object = imd.search_person(actor_name)[0]
 		# imd.update(actor_object)
@@ -59,6 +56,121 @@ class MainHandler(tornado.web.RequestHandler):
 		# MOVIE_LIST = get_released_movies(actor_object)
 		# movie, critics_score, audience_score = get_one_movie()
 
+
+class GameHandler(tornado.web.RequestHandler):
+	def get(self):
+		actor_name = self.get_argument('actor_entered')
+		players_entry = self.get_argument('players')
+		players_list = players_entry.split(',')
+		players = {}
+		for player in players_list:
+			players[player.strip()] = 0
+
+		print players
+	
+		game = Game(players)
+		# actor_id = actor_in_db(actor_name)
+		print game.players
+
+	# 	if actor_in_db(actor_name):
+	# 		print "Found actor in database. Yay."
+	# 		# movie_id_list = search_movieIDs_on_mongo(actor_id)
+	# 		# for movieID in movie_id_list:
+	# 		# 	global MOVIE_LIST
+	# 		# 	movieObject = Movie(MovieID)
+	# 		# 	MOVIE_LIST.append(movieObject)
+	# 		# movie= MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
+	# 		# critics_score = movie.critics_score
+	# 		# audience_score = movie.audience_score
+	# 		# self.render("game_round.html", title='title',  movie=movie,
+	# 		# 		 critics_score=critics_score, audience_score=audience_score)
+	# 	else:
+	# 		print "Didn't find actor in database. Booh"
+		
+
+		# actorObject, game.movie_list = search_info_on_imdb(actor_name)
+		# print len(game.movie_list)
+		# movie = game.pop_movie_from_list()
+		# print len(game.movie_list)
+		# print movie
+		# print actorObject
+		print game.players
+		score_update = {'Tom': 34, "Dick": 67, "Harry": 56}
+		game.update_player_scores(score_update)
+		print game.players
+			# 		critics_score, audience_score = self.get_one_movie()
+	# 		self.render("game_round.html", title='title',  movie=movie,
+	# 				 critics_score=critics_score, audience_score=audience_score)
+	# 		enter_actor_in_db(actorObject)
+
+	# def post(self):
+	# 	movie = game.pop_movie_from_list()
+	# 	self.render("game_round.html", title='title', movie=movie, 
+	# 				critics_score=critics_score, audience_score= audience_score)
+
+
+# class RoundHandler(tornado.web.RequestHandler):
+# 	def post(self):
+# 		movie, critics_score, audience_score = get_one_movie()
+# 		self.render("game_round.html", title='title', movie=movie, 
+# 					critics_score=critics_score, audience_score= audience_score)
+
+
+def get_one_movie():
+	"""Pick movie for the coming round if movie has reviews"""
+	# refactor this function, no globals
+	movie_choice = Movie_List.pop(random.randrange(len(Movie_List)))
+	has_reviews, critics, audience = reviews_exist(movie_choice.movieID)
+	
+	if not has_reviews:
+		return self.get_one_movie()
+	else:
+		update_movie_info(movie_choice)
+		return movie_choice, critics, audience
+
+
+def search_info_on_imdb(actor_name):
+		actor_object = imd.search_person(actor_name)[0]
+		imd.update(actor_object)
+		return actor_object, get_released_movies(actor_object)
+		# movie, critics_score, audience_score = get_one_movie()
+		# return movie, critics_score, audience_score
+		# return actor_object
+
+
+def enter_actor_in_db(actor, movie_list):
+	print str(len(movie_List)) + " movies in total to enter into database."
+	split_name = actor['canonical name'].split(",")
+	total_movie_dict = []
+
+	for movie in movie_List:
+		update_movie_info(movie)
+
+		movie_dict = {'Title': movie['title'], 
+						'Year': movie['year'],
+			 			'Director': str(movie['director'][0]['name']),
+			 			'Plot Outline': movie['plot outline'],
+			 			'Plot': movie['plot'],
+			 			# 'Poster': movie['full-size cover url']  
+			 			}
+
+		cast = ''
+		for actor in movie['cast'][:5]:
+			cast += actor['name'] + ", "
+		movie_dict['Cast'] = cast
+		total_movie_dict.append(movie_dict)
+		print "Finished " + str(len(total_movie_dict)) + " of " + str(len(MOVIE_LIST)) + " movies."
+
+	db.actors.insert({
+						"IMDb PersonID": actor.personID, 
+						"Last Name": split_name[0].strip(),
+						"First Name": split_name[1].strip(),
+						# "Birth year": actor['birth date'],
+						# "Biography": actor['bio'],
+						"Movies": total_movie_dict
+
+						})
+	print "Finished saving all of the movies from this actor/actress."
 
 
 def search_movieIDs_on_mongodb(actor_id):
@@ -98,57 +210,13 @@ def actor_in_db(actor_name):
  		return False
 
 
-def search_info_on_imdb(actor_name):
-	global MOVIE_LIST
-	actor_object = imd.search_person(actor_name)[0]
-	imd.update(actor_object)
-	MOVIE_LIST = get_released_movies(actor_object)
-	# movie, critics_score, audience_score = get_one_movie()
-	# return movie, critics_score, audience_score
-	return actor_object
-
-
-def enter_actor_in_db(actor):
-	global MOVIE_LIST
-	print str(len(MOVIE_LIST)) + " movies in total to enter into database."
-	split_name = actor['canonical name'].split(",")
-	total_movie_dict = []
-
-	for movie in MOVIE_LIST:
-		update_movie_info(movie)
-
-		movie_dict = {'Title': movie['title'], 
-						'Year': movie['year'],
-			 			'Director': str(movie['director'][0]['name']),
-			 			'Plot Outline': movie['plot outline'],
-			 			'Plot': movie['plot'],
-			 			# 'Poster': movie['full-size cover url']  
-			 			}
-
-		cast = ''
-		for actor in movie['cast'][:5]:
-			cast += actor['name'] + ", "
-		movie_dict['Cast'] = cast
-		total_movie_dict.append( movie_dict)
-		print "Finished " + str(len(total_movie_dict)) + " of " + str(len(MOVIE_LIST)) + " movies."
-
-	db.actors.insert({
-						"IMDb PersonID": actor.personID, 
-						"Last Name": split_name[0].strip(),
-						"First Name": split_name[1].strip(),
-						# "Birth year": actor['birth date'],
-						# "Biography": actor['bio'],
-						"Movies": total_movie_dict
-
-						})
-	print "Finished saving all of the movies from this actor/actress."
 
 
 class Movie():
 	def __init__(self, MovieID):
 		self.MovieID = MovieID
 		
-		entry_in_mongo = db.movie_info.find({'MovieID': self.movieID})
+		entry_in_mongo = db.actors.find({'MovieID': self.movieID})
 		for entry in entry_in_mongo:
 			self.title = entry['Title']
 			self.year = entry['Year']
@@ -158,6 +226,19 @@ class Movie():
 			self.plot = entry['Plot']
 			self.critics_score = entry['Critics Rating']
 			self.audience_score = entry['Audience Rating']
+
+
+class Game():
+	def __init__(self, players):
+		self.players = players
+		self.movie_list = None
+
+	def pop_movie_from_list(self):
+		return self.movie_list.pop(random.randrange(len(self.movie_list)))
+
+	def update_player_scores(self, score_update):
+		for player in self.players:
+			self.players[player] += score_update[player] 
 
 
 def get_released_movies(actor):
@@ -181,17 +262,17 @@ def get_released_movies(actor):
 	return movie_list
 
 
-def get_one_movie():
-	"""Pick movie for the coming round if movie has reviews"""
-	# refactor this function, no globals
-	movie_choice = MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
-	has_reviews, critics, audience = reviews_exist(movie_choice.movieID)
+# def get_one_movie():
+# 	"""Pick movie for the coming round if movie has reviews"""
+# 	# refactor this function, no globals
+# 	movie_choice = MOVIE_LIST.pop(random.randrange(len(MOVIE_LIST)))
+# 	has_reviews, critics, audience = reviews_exist(movie_choice.movieID)
 	
-	if not has_reviews:
-		return get_one_movie()
-	else:
-		update_movie_info(movie_choice)
-		return movie_choice, critics, audience
+# 	if not has_reviews:
+# 		return get_one_movie()
+# 	else:
+# 		update_movie_info(movie_choice)
+# 		return movie_choice, critics, audience
 
 
 def reviews_exist(movieID):
@@ -266,30 +347,23 @@ def movie_in_db(movieID):
 		print "Something went wrong in function movie_in_db."
 
 
-class ActorHandler(tornado.web.RequestHandler):
-	def post(self):
-		global MOVIE_LIST
-		actor_name = self.get_argument('actorName')
-		actor_in_db(actor_name)
+# class ActorHandler(tornado.web.RequestHandler):
+# 	def post(self):
+# 		global MOVIE_LIST
+# 		actor_name = self.get_argument('actorName')
+# 		actor_in_db(actor_name)
 
-		actor_object = imd.search_person(actor_name)[0]
-		imd.update(actor_object)
-		MOVIE_LIST = get_released_movies(actor_object)
+# 		actor_object = imd.search_person(actor_name)[0]
+# 		imd.update(actor_object)
+# 		MOVIE_LIST = get_released_movies(actor_object)
 	
 
-class RoundHandler(tornado.web.RequestHandler):
-	def post(self):
-		movie, critics_score, audience_score = get_one_movie()
-		self.render("game_round.html", title='title', movie=movie, 
-					critics_score=critics_score, audience_score= audience_score)
-
-
-class Actor():
-	def __init__(self, PersonID, lname, fname, birth):
-		self.PersonID = PersonID
-		self.lname = lname
-		self.fname = fname
-		self.birth = birth
+# class Actor():
+# 	def __init__(self, PersonID, lname, fname, birth):
+# 		self.PersonID = PersonID
+# 		self.lname = lname
+# 		self.fname = fname
+# 		self.birth = birth
 		# self.filmography = filmography
 		# self.death = death
 		# self.bio = bio
@@ -317,8 +391,8 @@ def enter_movies_in_db():
 
 application = tornado.web.Application([
 										(r"/", MainHandler),
-										(r"/getactor", ActorHandler),
-										(r"/nextround", RoundHandler)
+										(r"/game", GameHandler),
+										# (r"/nextround", RoundHandler)
 										],
 										static_path="static",
 										debug=True)
