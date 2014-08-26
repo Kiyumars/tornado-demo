@@ -27,20 +27,24 @@
 			$("#reveal_plot").hide();
 		});
 
-		$("#start_game").click(function(){
-			var actor_entered = $("#actor_entered").val();
-			var players = $("#players").val();
 
-			$.ajax({
-				type: "POST",
-				url: "/game_test",
-				data: {actor_entered: actor_entered,
-						players: players},
-				success: function(data){
-					$('html').html(data);
-				}
-			});
-		});
+		// $("#actor_entered").text = "Nicolas Cage";
+		// $("#players").text = "Larry, Curly, Moe";
+
+		// $("#start_game").click(function(){
+		// 	var actor_entered = $("#actor_entered").val();
+		// 	var players = $("#players").val();
+
+		// 	$.ajax({
+		// 		type: "POST",
+		// 		url: "/game_test",
+		// 		data: {actor_entered: actor_entered,
+		// 				players: players},
+		// 		success: function(data){
+		// 			$('html').html(data);
+		// 		}
+		// 	});
+		// });
 
 		$("#players").keydown(function(){
 			if($("#actor_entered").val().length > 0 && $("#players").val().length > 0){

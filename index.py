@@ -3,6 +3,7 @@ import random
 import json
 import urllib2
 import sys
+from bson.objectid import ObjectId
 
 import tornado.ioloop
 import tornado.web
@@ -40,10 +41,22 @@ class TestHandler(tornado.web.RequestHandler):
 
 		game_id = db.game_input.insert({"Players": players, "Actor": actor_name})
 		print game_id
-		self.render("game_test.html", actor_name="actor_name", players=players, game_id=game_id)
+		self.render("game_test.html", actor_name=actor_name, players=players, game_id=game_id)
 
 
+class ScoreHandler(tornado.web.RequestHandler):
+	def post(self):
+		print "We are in ScoreHandler"
+		game_id = self.get_argument("game_id")
+		print game_id
+		game_entry = db.game_input.find({"_id": ObjectId(game_id)})
+		players = game_entry[0]["Players"]
+		for player in players:
+			players[player] += int(self.get_argument(player))
+		print players
 
+		print db.game_input.update({"_id": ObjectId(game_id)}, {"Players": players})
+		self.render("score_update.html", players=players, game_id=game_id)
 
 class Game():
 	def __init__(self):
@@ -62,17 +75,17 @@ class GameHandler(tornado.web.RequestHandler):
 	def get(self):
 		actor_name = self.get_argument('actor_entered')
 		# actor_name = "Nicolas Cage"
-		# players_entry = self.get_argument('players')
-		# players_list = players_entry.split(',')
-		players = {"Philip": 0, "Michael": 0}
-		# for player in players_list:
-		# 	players[player.strip()] = 0
+		players_entry = self.get_argument('players')
+		players_list = players_entry.split(',')
+		# players = {"Philip": 0, "Michael": 0}
+		for player in players_list:
+			players[player.strip()] = 0
 
-		# print players
+		print players
 	
-		game = Game(players)
+		# game = Game(players)
 		# actor_id = actor_in_db(actor_name)
-		print game.players
+		# print game.players
 
 		actorObject, game.movie_list = search_info_on_imdb(actor_name)
 		print len(game.movie_list)
@@ -305,7 +318,8 @@ def enter_movies_in_db():
 application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/game", GameHandler),
-										(r"/game_test", TestHandler)
+										(r"/game_test", TestHandler),
+										(r"/score_update", ScoreHandler)
 										# (r"/nextround", RoundHandler)
 										],
 										static_path="static",
