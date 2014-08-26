@@ -26,15 +26,18 @@ class MainHandler(tornado.web.RequestHandler):
 
 
 class TestHandler(tornado.web.RequestHandler):
-	def post(self):
+	def get(self):
 		print "We are in TestHandler"
-		actor_name = self.get_argument('actor_entered')
-		print actor_name
-		players_entry = self.get_argument('players')
-		print players_entry
-		players_list = players_entry.split(',')
-		# players = {"Philip": 0, "Michael": 0}
-		players = {}
+		try:
+			actor_name = self.get_argument('actor_entered')
+			print actor_name
+			players_entry = self.get_argument('players')
+			print players_entry
+			players_list = players_entry.split(',')
+			# players = {"Philip": 0, "Michael": 0}
+			players = {}
+		except:
+			self.redirect("/")
 		for player in players_list:
 			players[player.strip()] = 0
 		print players
@@ -45,9 +48,12 @@ class TestHandler(tornado.web.RequestHandler):
 
 
 class ScoreHandler(tornado.web.RequestHandler):
-	def post(self):
+	def get(self):
 		print "We are in ScoreHandler"
-		game_id = self.get_argument("game_id")
+		try:
+			game_id = self.get_argument("game_id")
+		except:
+			self.redirect("/")
 		print game_id
 		game_entry = db.game_input.find({"_id": ObjectId(game_id)})
 		players = game_entry[0]["Players"]

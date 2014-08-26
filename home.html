@@ -10,14 +10,14 @@
 {% block content %}
 
 <div id="enter_info">
-<form method='POST' action='/game_test'>
-Enter the name of an actor/actress  <input name="actor_entered" id="actor_entered" value="Tom Cruise"></input><br><br>
+	<form method='GET' action='/game_test'>
+		Enter the name of an actor/actress  <input name="actor_entered" id="actor_entered" value="Tom Cruise"></input><br><br>
 
-Enter one or more player <input id="players" name="players" value='Larry, Curly, Moe'></input> <br>
-Seperate names with a "," <br> <br>
-
-<button id="start_game">Let's start the game. </button>
-</form>
+		Enter one or more player <input id="players" name="players" value='Larry, Curly, Moe'></input> <br>
+		Seperate names with a "," <br> <br>
+		<input type="submit" value="Start the game">
+		<!-- <button id="start_game">Let's start the game. </button> -->
+	</form>
 </div>
 
 <div id="game_content">

@@ -7,7 +7,7 @@
 	{% end %}
 	
 	The actor's name is {{actor_name}}. <br> <br>
-	<form method="POST" action="/score_update">
+	<form method="GET" action="/score_update">
 		{% for player in players %}
 			{{ player }}'s guess: <input type="text" id="{{ player }}" name="{{ player }}" placeholder="{{player}}, enter your guess." value="42"> <br>
 		{% end %}
