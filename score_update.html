@@ -5,7 +5,7 @@
 		{{ player }}: {{ players[player] }} points <br>
 	{% end %}
 
-	<form method="POST" action="/score_update">
+	<form method="GET" action="/score_update">
 		{% for player in players %}
 			{{ player }}'s guess: <input type="text" id="{{ player }}" name="{{ player }}" value="42"> <br><br>
 		{% end %}
