@@ -25,45 +25,45 @@ class MainHandler(tornado.web.RequestHandler):
 		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
 
 
-class TestHandler(tornado.web.RequestHandler):
-	def get(self):
-		print "We are in TestHandler"
-		try:
-			actor_name = self.get_argument('actor_entered')
-			print actor_name
-			players_entry = self.get_argument('players')
-			print players_entry
-			players_list = players_entry.split(',')
-			# players = {"Philip": 0, "Michael": 0}
-			players = {}
-		except:
-			self.redirect("/")
-		for player in players_list:
-			players[player.strip()] = 0
-		print players
+# class TestHandler(tornado.web.RequestHandler):
+# 	def get(self):
+# 		print "We are in TestHandler"
+# 		try:
+# 			actor_name = self.get_argument('actor_entered')
+# 			print actor_name
+# 			players_entry = self.get_argument('players')
+# 			print players_entry
+# 			players_list = players_entry.split(',')
+# 			# players = {"Philip": 0, "Michael": 0}
+# 			players = {}
+# 		except:
+# 			self.redirect("/")
+# 		for player in players_list:
+# 			players[player.strip()] = 0
+# 		print players
 
 
-		game_id = db.game_input.insert({"Players": players, "Actor": actor_name})
-		print game_id
-		self.render("game_test.html", actor_name=actor_name, players=players, game_id=game_id)
+# 		game_id = db.game_input.insert({"Players": players, "Actor": actor_name})
+# 		print game_id
+# 		self.render("game_test.html", actor_name=actor_name, players=players, game_id=game_id)
 
 
-class ScoreHandler(tornado.web.RequestHandler):
-	def get(self):
-		print "We are in ScoreHandler"
-		try:
-			game_id = self.get_argument("game_id")
-		except:
-			self.redirect("/")
-		print game_id
-		game_entry = db.game_input.find({"_id": ObjectId(game_id)})
-		players = game_entry[0]["Players"]
-		for player in players:
-			players[player] += int(self.get_argument(player))
-		print players
+# class ScoreHandler(tornado.web.RequestHandler):
+# 	def get(self):
+# 		print "We are in ScoreHandler"
+# 		try:
+# 			game_id = self.get_argument("game_id")
+# 		except:
+# 			self.redirect("/")
+# 		print game_id
+# 		game_entry = db.game_input.find({"_id": ObjectId(game_id)})
+# 		players = game_entry[0]["Players"]
+# 		for player in players:
+# 			players[player] += int(self.get_argument(player))
+# 		print players
 
-		print db.game_input.update({"_id": ObjectId(game_id)}, {"Players": players})
-		self.render("score_update.html", players=players, game_id=game_id)
+# 		print db.game_input.update({"_id": ObjectId(game_id)}, {"Players": players})
+# 		self.render("score_update.html", players=players, game_id=game_id)
 
 class Game():
 	def __init__(self):
@@ -99,12 +99,14 @@ class GameHandler(tornado.web.RequestHandler):
 		players = {}
 		# players = {"Philip": 0, "Michael": 0}
 		for player in players_list:
+			print player
 			players[player.strip()] = 0
 
 		print players
 		
 		self.render("game_round.html", title='title', 
-					movie=movie, critics_score=critics_score, audience_score=audience_score)
+					movie=movie, critics_score=critics_score, audience_score=audience_score,
+					players=players)
 
 
 	def post(self):
@@ -123,7 +125,7 @@ def enter_actor_in_caching_db(actor_object):
 
 def male_or_female(actor):
 	print "We are in male_or_female"
-	if actor['actor']:
+	if 'actor' in actor.keys():
 		return actor['actor']
 	else:
 		return actor['actress']
@@ -433,8 +435,8 @@ def enter_movies_in_db():
 application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/game", GameHandler),
-										(r"/game_test", TestHandler),
-										(r"/score_update", ScoreHandler)
+										# (r"/game_test", TestHandler),
+										# (r"/score_update", ScoreHandler)
 										# (r"/nextround", RoundHandler)
 										],
 										static_path="static",

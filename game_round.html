@@ -22,18 +22,25 @@
 	Cast: {% for cast in movie['cast'][:5] %} {{str(cast)}}, {% end %} 
 	{% end %} 
 	<br><br>
-	Plot outline: {{movie['plot outline']}} <br>
+	Plot outline: {{movie['plot outline']}} <br><br>
+	
+
+	<h4>Extra Hints</h4>
+
+	Poster: <a href='{{movie["full-size cover url"]}}' target='_blank'> Click here</a><br><br>
+	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot'][0]}} </div><br><br>
+
+	{% for player in players %}
+		{{player}}: {{players[player]}} <br>
+	{% end %} <br><br>
+	
+	<!-- <form method="GET" action="/score_update"> -->
+		{% for player in players %}
+			{{ player }}'s guess: <input type="text" id="{{ player }}" name="{{ player }}" placeholder="{{player}}, enter your guess." value="42"> <br>
+		{% end %}
 	<button id='reveal_ratings'>Reveal ratings</button><br><br>
 	<div id='ratings'>
 	Critics ratings score: {{ critics_score}} <br>
 	Audience ratings score: {{ audience_score }}<br>
 	</div>
-	<form action="/game" method="POST">
-	<input type='submit' id="another_round" name="another_round">
-	</form>
-
-	<h4>Extra Hints</h4>
-
-	Poster: <a href='{{movie["full-size cover url"]}}' target='_blank'> Click here</a><br><br>
-	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot'][0]}} </div>
 
