@@ -96,21 +96,16 @@ class GameHandler(tornado.web.RequestHandler):
 		# actor_name = "Nicolas Cage"
 		players_entry = self.get_argument('players')
 		players_list = players_entry.split(',')
+		players = {}
 		# players = {"Philip": 0, "Michael": 0}
 		for player in players_list:
 			players[player.strip()] = 0
 
 		print players
 		
-
-
-
 		self.render("game_round.html", title='title', 
 					movie=movie, critics_score=critics_score, audience_score=audience_score)
-	# # critics_score, audience_score = self.get_one_movie()
-	# # 		self.render("game_round.html", title='title',  movie=movie,
-	# # 				 critics_score=critics_score, audience_score=audience_score)
-	# # 		enter_actor_in_db(actorObject)
+
 
 	def post(self):
 		pass
