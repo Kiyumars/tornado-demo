@@ -49,7 +49,7 @@ class GameHandler(tornado.web.RequestHandler):
 			print "No more movies available from that actor. Exiting the game. Please play again soon, but choose a more prolific actor."
 		movie, critics_score, audience_score = movie_available
 		enter_movie_in_actors_db(movie, Actor.personID, critics_score, audience_score)
-		enter_ratings_scores_in_game_db(game_id, critics_score, audience_score)
+		push_ratings_scores_in_game_db(game_id, critics_score, audience_score)
 		#enter all movies in both databases in an asynchronous loop
 		
 
@@ -121,10 +121,13 @@ def start_game_session(players):
 	return game_id
 
 
-def enter_ratings_scores_in_game_db(game_id, critics_score, audience_score):
-	db.game_sessions.update({"_id": game_id}, {"Critics": critics_score,
-												"Audience": audience_score
-												}, True)
+def push_ratings_scores_in_game_db(game_id, critics_score, audience_score):
+	print "We are in push_ratings_scores_in_game_db"
+	print type(critics_score)
+	print type(audience_score)
+	print db.game_sessions.update({"_id": game_id}, { "$set":  {"Critics": critics_score,
+												"Audience": audience_score} 
+												})
 
 
 def actor_in_db(actor_name):
