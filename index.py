@@ -27,21 +27,14 @@ class MainHandler(tornado.web.RequestHandler):
 
 class GameHandler(tornado.web.RequestHandler):
 	def get(self):
-		players_entry = self.get_argument('players')
-		players_list = players_entry.split(',')
-		players = {}
-		# players = {"Philip": 0, "Michael": 0}
-		for player in players_list:
-			print player
-			players[player.strip()] = 0
+		players = create_player_dict(self.get_argument('players'))
+		
 
 		game_id = start_game_session(players)
-		print "We are in GameHandler."
 		actor_name = self.get_argument('actor_entered')
-		print actor_name
 		Actor = get_actor_object_from_imdb(actor_name)
-		print Actor
 		enter_actor_in_actors_db(Actor)
+
 		# actor_db_entry_id = enter_actor_in_caching_db(actor_object)
 		# print actor_db_entry_id
 		movie_available = return_appropriate_movie(Actor)
@@ -122,12 +115,20 @@ def start_game_session(players):
 
 
 def push_ratings_scores_in_game_db(game_id, critics_score, audience_score):
-	print "We are in push_ratings_scores_in_game_db"
-	print type(critics_score)
-	print type(audience_score)
-	print db.game_sessions.update({"_id": game_id}, { "$set":  {"Critics": critics_score,
+
+	db.game_sessions.update({"_id": game_id}, { "$set":  {"Critics": critics_score,
 												"Audience": audience_score} 
 												})
+
+
+def create_player_dict(players_str):
+	players_list = players_str.split(',')
+	players = {}
+	# players = {"Philip": 0, "Michael": 0}
+	for player in players_list:
+		players[player.strip()] = 0
+
+	return players
 
 
 def actor_in_db(actor_name):
