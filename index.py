@@ -28,23 +28,25 @@ class MainHandler(tornado.web.RequestHandler):
 class GameHandler(tornado.web.RequestHandler):
 	def get(self):
 		players = create_player_dict(self.get_argument('players'))
-		
-
 		game_id = start_game_session(players)
+
 		actor_name = self.get_argument('actor_entered')
 		Actor = get_actor_object_from_imdb(actor_name)
 		enter_actor_in_actors_db(Actor)
 
-		# actor_db_entry_id = enter_actor_in_caching_db(actor_object)
-		# print actor_db_entry_id
-		movie_available = return_appropriate_movie(Actor)
+		movie_available = return_appropriate_movie(actor_or_actress(Actor))
 		if not movie_available:
 			print "No more movies available from that actor. Exiting the game. Please play again soon, but choose a more prolific actor."
 		movie, critics_score, audience_score = movie_available
+
 		enter_movie_in_actors_db(movie, Actor.personID, critics_score, audience_score)
 		push_ratings_scores_in_game_db(game_id, critics_score, audience_score)
+		movie_list = actor_or_actress(Actor)
+		tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
+										movie_list, Actor.personID,
+										 game_id)
+
 		#enter all movies in both databases in an asynchronous loop
-		
 
 		self.render("game_round.html", title='title', 
 					movie=movie, critics_score=critics_score, audience_score=audience_score,
@@ -171,7 +173,7 @@ def enter_game_session_info_in_game_db(critics_score, audience_score, players):
 
 
 def actor_or_actress(actor):
-	print "We are in male_or_female"
+	print "We are in actor_or_actress."
 	if 'actor' in actor.keys():
 		return actor['actor']
 	else:
@@ -182,9 +184,8 @@ def pick_random_movie_object(movie_list):
 	return movie_list.pop(random.randrange(len(movie_list) - 1 ) )
 
 
-def return_appropriate_movie(actor_object):
+def return_appropriate_movie(movie_list):
 	print "We are in return_appropriate_movie"
-	movie_list = actor_or_actress(actor_object)
 
 	useful = False
 	while not useful and len(movie_list) > 0:
@@ -319,12 +320,19 @@ def enter_movie_in_actors_db(movie, actor_id, critics_score, audience_score):
 	print "Entered one movie of this actor/actress."
 
 
-def enter_all_movies_in_both_dbases(movie_list, actor_id, game_id, 
-									critics_score, audience_score):
-	while len(movie_list) > 0:
-		movie = return_appropriate_movie(movie_list)
-		enter_movie_in_actor_db(movie, actor_id, critics_score, audience_score)
+def enter_all_movies_in_both_dbases(movie_list, actor_id, game_id):
+	print "In enter_all_movies_in_both_dbases"
+	if len(movie_list) > 0:
+		movie, critics_score, audience_score  = return_appropriate_movie(movie_list)
+		enter_movie_in_actors_db(movie, actor_id, critics_score, audience_score)
 		enter_movie_into_game_db(movie, game_id, critics_score, audience_score)
+		print "Entered one movie in both dbases."
+		tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
+													movie_list, actor_id,
+										 			game_id)
+	else:
+		print "Finished enter_all_movies_in_both_dbases"
+
 
 
 def enter_movie_into_game_db(movie, game_id, 
