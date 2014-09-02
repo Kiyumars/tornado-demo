@@ -42,14 +42,13 @@ class GameHandler(tornado.web.RequestHandler):
 		enter_movie_in_actors_db(movie, Actor.personID, critics_score, audience_score)
 		push_ratings_scores_in_game_db(game_id, critics_score, audience_score)
 		movie_list = actor_or_actress(Actor)
-		# tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
-		# 											movie_list, Actor.personID,
-		# 											 game_id)
+		tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
+													movie_list, Actor.personID,
+													 game_id)
 
 
 		self.render("game_round.html", title='title', 
-					movie=movie, critics_score=critics_score, audience_score=audience_score,
-					players=players, game_id=game_id)
+					movie=movie,players=players, game_id=game_id)
 
 
 	def post(self):
@@ -81,7 +80,7 @@ class ScoreHandler(tornado.web.RequestHandler):
 
 
 		print db.game_sessions.update({"_id": ObjectId(game_id)}, 
-									{"$set": {"Players scores": players_scores}})
+									{"Players scores": players_scores})
 		
 		self.render("score_update.html", players_scores=players_scores,
 										 players_guesses= players_guesses,
@@ -89,6 +88,36 @@ class ScoreHandler(tornado.web.RequestHandler):
 										 critics_score=critics_score,
 										 game_id=game_id)
 
+
+class RoundHandler(tornado.web.RequestHandler):
+	def get(self):
+		print "We are in ScoreHandler"
+		
+		try:
+			game_id = self.get_argument("game_id")
+		except:
+			self.redirect("/")
+		print game_id
+
+		game_entry = db.game_sessions.find({"_id": ObjectId(game_id)})
+		print "This is the number of game entries. It should be 1."
+		print game_entry.count()
+
+		players = []
+		for player in game_entry[0]["Players scores"]:
+			players.append(player)
+
+		movie = pick_movie_from_game_sessions_db(game_entry)
+		print db.game_sessions.update({"_id": game_id}, {"Critics": movie['critics_score']})
+		print movie
+		self.render("game_round.html", movie=movie, players=players, game_id=game_id)
+
+
+def pick_movie_from_game_sessions_db(game_entry):
+	print game_entry[0]
+	random_index = random.randint(0, len(game_entry[0]["Movies"]))
+	return game_entry["Movies"][random_index]
+	
 
 def get_actor_object_from_imdb(actor_name):
 	actor_object = imd.search_person(actor_name)[0]
@@ -102,7 +131,8 @@ def start_game_session(players):
 	for player in players:
 		player_guesses[player] = 0
 	game_id = db.game_sessions.insert({
-										"Player scores": players
+										"Player scores": players,
+										"Movies": [],
 										# "Player guesses": player_guesses 
 										})
 
@@ -119,7 +149,6 @@ def push_ratings_scores_in_game_db(game_id, critics_score, audience_score):
 def create_player_dict(players_str):
 	players_list = players_str.split(',')
 	players = {}
-	# players = {"Philip": 0, "Michael": 0}
 	for player in players_list:
 		players[player.strip()] = 0
 
@@ -174,7 +203,7 @@ def actor_or_actress(actor):
 
 
 def pick_random_movie_object(movie_list):
-	return movie_list.pop(random.randrange(len(movie_list) - 1 ) )
+	return movie_list.pop(random.randrange(len(movie_list) ) )
 
 
 def return_appropriate_movie(movie_list):
@@ -335,20 +364,20 @@ def enter_movie_into_game_db(movie, game_id,
 
 
 def prepare_movie_dict_entry(movie, critics_score, audience_score):
-	movie_dict = {'Title': movie['title'], 
-					'Year': movie['year'],
-		 			'Director': str(movie['director'][0]['name']),
-		 			'Plot Outline': movie['plot outline'],
-		 			'Plot': movie['plot'],
-		 			'Poster': movie['full-size cover url'],
-		 			"Critics": critics_score,
-		 			"Audience": audience_score  
+	movie_dict = {'title': movie['title'], 
+					'year': movie['year'],
+		 			'director': str(movie['director'][0]['name']),
+		 			'plot outline': movie['plot outline'],
+		 			'plot': movie['plot'],
+		 			'full-size cover url': movie['full-size cover url'],
+		 			"critics_score": critics_score,
+		 			"audience_score": audience_score  
 		 			}
 
 	cast = []
 	for i in range(len(movie['cast'])):
 		cast.append(movie['cast'][i]['name'])
-	movie_dict['Cast'] = cast
+	movie_dict['cast'] = cast
 
 	return movie_dict
 
@@ -430,8 +459,8 @@ application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/game", GameHandler),
 										# (r"/game_test", TestHandler),
-										(r"/score_update", ScoreHandler)
-										# (r"/nextround", RoundHandler)
+										(r"/score_update", ScoreHandler),
+										(r"/next_round", RoundHandler)
 										],
 										static_path="static",
 										debug=True)

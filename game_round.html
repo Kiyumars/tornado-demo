@@ -30,9 +30,6 @@
 	Poster: <a href='{{movie["full-size cover url"]}}' target='_blank'> Click here</a><br><br>
 	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot'][0]}} </div><br><br>
 
-	{% for player in players %}
-		{{player}}: {{players[player]}} points<br>
-	{% end %} <br><br>
 	
 	<form method="GET" action="/score_update">
 		{% for player in players %}
