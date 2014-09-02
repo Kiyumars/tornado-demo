@@ -42,11 +42,10 @@ class GameHandler(tornado.web.RequestHandler):
 		enter_movie_in_actors_db(movie, Actor.personID, critics_score, audience_score)
 		push_ratings_scores_in_game_db(game_id, critics_score, audience_score)
 		movie_list = actor_or_actress(Actor)
-		tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
-										movie_list, Actor.personID,
-										 game_id)
+		# tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
+		# 											movie_list, Actor.personID,
+		# 											 game_id)
 
-		#enter all movies in both databases in an asynchronous loop
 
 		self.render("game_round.html", title='title', 
 					movie=movie, critics_score=critics_score, audience_score=audience_score,
@@ -56,45 +55,39 @@ class GameHandler(tornado.web.RequestHandler):
 	def post(self):
 		pass
 
-# class TestHandler(tornado.web.RequestHandler):
-# 	def get(self):
-# 		print "We are in TestHandler"
-# 		try:
-# 			actor_name = self.get_argument('actor_entered')
-# 			print actor_name
-# 			players_entry = self.get_argument('players')
-# 			print players_entry
-# 			players_list = players_entry.split(',')
-# 			# players = {"Philip": 0, "Michael": 0}
-# 			players = {}
-# 		except:
-# 			self.redirect("/")
-# 		for player in players_list:
-# 			players[player.strip()] = 0
-# 		print players
+
+class ScoreHandler(tornado.web.RequestHandler):
+	def get(self):
+		print "We are in ScoreHandler"
+		try:
+			game_id = self.get_argument("game_id")
+		except:
+			self.redirect("/")
+		print game_id
+		game_entry = db.game_sessions.find({"_id": ObjectId(game_id)})
+
+		players_guesses = {}
+		players_penalties = {}
+		critics_score = game_entry[0]['Critics']
+		players_scores = game_entry[0]["Player scores"]
+
+		for player in players_scores:
+			player_guess = int(self.get_argument(player))
+			players_guesses[player] = player_guess
+			player_penalties = abs(critics_score - player_guess)
+			players_scores[player] += player_penalties
+			players_penalties[player] = player_penalties
+		
 
 
-# 		game_id = db.game_input.insert({"Players": players, "Actor": actor_name})
-# 		print game_id
-# 		self.render("game_test.html", actor_name=actor_name, players=players, game_id=game_id)
-
-
-# class ScoreHandler(tornado.web.RequestHandler):
-# 	def get(self):
-# 		print "We are in ScoreHandler"
-# 		try:
-# 			game_id = self.get_argument("game_id")
-# 		except:
-# 			self.redirect("/")
-# 		print game_id
-# 		game_entry = db.game_input.find({"_id": ObjectId(game_id)})
-# 		players = game_entry[0]["Players"]
-# 		for player in players:
-# 			players[player] += int(self.get_argument(player))
-# 		print players
-
-# 		print db.game_input.update({"_id": ObjectId(game_id)}, {"Players": players})
-# 		self.render("score_update.html", players=players, game_id=game_id)
+		print db.game_sessions.update({"_id": ObjectId(game_id)}, 
+									{"$set": {"Players scores": players_scores}})
+		
+		self.render("score_update.html", players_scores=players_scores,
+										 players_guesses= players_guesses,
+										 players_penalties=players_penalties,
+										 critics_score=critics_score,
+										 game_id=game_id)
 
 
 def get_actor_object_from_imdb(actor_name):
@@ -109,8 +102,8 @@ def start_game_session(players):
 	for player in players:
 		player_guesses[player] = 0
 	game_id = db.game_sessions.insert({
-										"Player scores": players,
-										"Player guesses": player_guesses 
+										"Player scores": players
+										# "Player guesses": player_guesses 
 										})
 
 	return game_id
@@ -437,7 +430,7 @@ application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/game", GameHandler),
 										# (r"/game_test", TestHandler),
-										# (r"/score_update", ScoreHandler)
+										(r"/score_update", ScoreHandler)
 										# (r"/nextround", RoundHandler)
 										],
 										static_path="static",
