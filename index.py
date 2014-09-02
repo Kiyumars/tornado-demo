@@ -34,15 +34,15 @@ class GameHandler(tornado.web.RequestHandler):
 		Actor = get_actor_object_from_imdb(actor_name)
 		enter_actor_in_actors_db(Actor)
 
-		movie_available = return_appropriate_movie(actor_or_actress(Actor))
-		if not movie_available:
+		movie = return_appropriate_movie(actor_or_actress(Actor))
+		if not movie:
 			print "No more movies available from that actor. Exiting the game. Please play again soon, but choose a more prolific actor."
-		movie, critics_score, audience_score = movie_available
+		
 
-		enter_movie_in_actors_db(movie, Actor.personID, critics_score, audience_score)
-		push_ratings_scores_in_game_db(game_id, critics_score, audience_score)
+		enter_movie_in_actors_db(movie, Actor.personID)
+		push_ratings_scores_in_game_db(game_id, movie['critics_score'], movie['audience_score'])
 		movie_list = actor_or_actress(Actor)
-		tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
+		tornado.ioloop.IOLoop.instance().call_later(100, enter_all_movies_in_both_dbases, 
 													movie_list, Actor.personID,
 													 game_id)
 
@@ -80,7 +80,7 @@ class ScoreHandler(tornado.web.RequestHandler):
 
 
 		print db.game_sessions.update({"_id": ObjectId(game_id)}, 
-									{"Players scores": players_scores})
+									{"$set": {"Player scores": players_scores}})
 		
 		self.render("score_update.html", players_scores=players_scores,
 										 players_guesses= players_guesses,
@@ -91,7 +91,7 @@ class ScoreHandler(tornado.web.RequestHandler):
 
 class RoundHandler(tornado.web.RequestHandler):
 	def get(self):
-		print "We are in ScoreHandler"
+		print "We are in RoundHandler"
 		
 		try:
 			game_id = self.get_argument("game_id")
@@ -99,23 +99,24 @@ class RoundHandler(tornado.web.RequestHandler):
 			self.redirect("/")
 		print game_id
 
-		game_entry = db.game_sessions.find({"_id": ObjectId(game_id)})
-		print "This is the number of game entries. It should be 1."
-		print game_entry.count()
+		game_entry = db.game_sessions.find({"_id": ObjectId(game_id)})[0]
+
+		print game_entry
 
 		players = []
-		for player in game_entry[0]["Players scores"]:
+		for player in game_entry["Player scores"]:
 			players.append(player)
 
 		movie = pick_movie_from_game_sessions_db(game_entry)
-		print db.game_sessions.update({"_id": game_id}, {"Critics": movie['critics_score']})
+		print db.game_sessions.update({"_id": ObjectId(game_id)}, 
+										{ "$set":  {"Critics": movie['critics_score']}})
 		print movie
 		self.render("game_round.html", movie=movie, players=players, game_id=game_id)
 
 
 def pick_movie_from_game_sessions_db(game_entry):
-	print game_entry[0]
-	random_index = random.randint(0, len(game_entry[0]["Movies"]))
+	print game_entry
+	random_index = random.randint(0, len(game_entry["Movies"]) - 1      )
 	return game_entry["Movies"][random_index]
 	
 
@@ -203,7 +204,7 @@ def actor_or_actress(actor):
 
 
 def pick_random_movie_object(movie_list):
-	return movie_list.pop(random.randrange(len(movie_list) ) )
+	return movie_list.pop(random.randint(0, len(movie_list) - 1      ))
 
 
 def return_appropriate_movie(movie_list):
@@ -227,7 +228,7 @@ def return_appropriate_movie(movie_list):
 		return False
 	print "We are returning a movie."
 	print movie
-	return movie, critics_score, audience_score
+	return prepare_movie_dict_entry(movie, critics_score, audience_score)
 
 
 def movie_has_relevant_keys(movie):
@@ -333,11 +334,9 @@ def enter_actor_in_actors_db(actor):
 
 					})
 
-def enter_movie_in_actors_db(movie, actor_id, critics_score, audience_score):
+def enter_movie_in_actors_db(movie, actor_id):
 
-	movie_dict = prepare_movie_dict_entry(movie, critics_score, audience_score)
-
-	db.actors.update({"IMDb PersonID": actor_id}, { "$push": {"Movies": movie_dict}})
+	db.actors.update({"IMDb PersonID": actor_id}, { "$push": {"Movies": movie }})
 
 	print "Entered one movie of this actor/actress."
 
@@ -345,11 +344,13 @@ def enter_movie_in_actors_db(movie, actor_id, critics_score, audience_score):
 def enter_all_movies_in_both_dbases(movie_list, actor_id, game_id):
 	print "In enter_all_movies_in_both_dbases"
 	if len(movie_list) > 0:
-		movie, critics_score, audience_score  = return_appropriate_movie(movie_list)
-		enter_movie_in_actors_db(movie, actor_id, critics_score, audience_score)
-		enter_movie_into_game_db(movie, game_id, critics_score, audience_score)
+		movie = return_appropriate_movie(movie_list)
+		if not movie:
+			return
+		enter_movie_in_actors_db(movie, actor_id)
+		enter_movie_into_game_db(movie, game_id)
 		print "Entered one movie in both dbases."
-		tornado.ioloop.IOLoop.instance().call_later(0, enter_all_movies_in_both_dbases, 
+		tornado.ioloop.IOLoop.instance().call_later(100, enter_all_movies_in_both_dbases, 
 													movie_list, actor_id,
 										 			game_id)
 	else:
@@ -357,16 +358,14 @@ def enter_all_movies_in_both_dbases(movie_list, actor_id, game_id):
 
 
 
-def enter_movie_into_game_db(movie, game_id, 
-								critics_score, audience_score):
-	movie_dict = prepare_movie_dict_entry(movie, critics_score, audience_score)
-	db.game_sessions.update({"_id": game_id}, {"$push": {"Movies": movie_dict}})
+def enter_movie_into_game_db(movie, game_id):
+	db.game_sessions.update({"_id": ObjectId(game_id)}, {"$push": {"Movies": movie}})
 
 
 def prepare_movie_dict_entry(movie, critics_score, audience_score):
 	movie_dict = {'title': movie['title'], 
 					'year': movie['year'],
-		 			'director': str(movie['director'][0]['name']),
+		 			'director': movie['director'][0]['name'],
 		 			'plot outline': movie['plot outline'],
 		 			'plot': movie['plot'],
 		 			'full-size cover url': movie['full-size cover url'],
@@ -374,10 +373,12 @@ def prepare_movie_dict_entry(movie, critics_score, audience_score):
 		 			"audience_score": audience_score  
 		 			}
 
+
 	cast = []
 	for i in range(len(movie['cast'])):
 		cast.append(movie['cast'][i]['name'])
 	movie_dict['cast'] = cast
+
 
 	return movie_dict
 
