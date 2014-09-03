@@ -19,7 +19,7 @@
 	<movie_info>Released in {{movie['year']}} </movie_info><br><br>
 	<movie_info>Director: {{movie['director'] }} </movie_info><br><br>
 	{% if movie['cast'][:5] %}
-	Cast: {% for cast in movie['cast'][:5] %} {{str(cast)}}, {% end %} 
+	Cast: {% for cast in movie['cast'][:5] %} {{cast}}, {% end %} 
 	{% end %} 
 	<br><br>
 	Plot outline: {{movie['plot outline']}} <br><br>

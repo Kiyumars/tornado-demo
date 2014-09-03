@@ -404,7 +404,6 @@ def update_movie_info(movie):
 application = tornado.web.Application([
 										(r"/", MainHandler),
 										(r"/game", GameHandler),
-										# (r"/game_test", TestHandler),
 										(r"/score_update", ScoreHandler),
 										(r"/next_round", RoundHandler)
 										],
