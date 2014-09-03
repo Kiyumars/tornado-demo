@@ -1,4 +1,4 @@
-
+{% extends "base.html" %}
 {% block game_content %}
 
 	The critics score is {{ critics_score }}. <br><br>
@@ -15,6 +15,16 @@
 		<input type="submit" value="Play new round!" >
 	</form>
 
+<div class="guess_graph">
+	{% for player in players_guesses %}
+		<div style="height: {{players_penalties[player]}}px;" class="bar"></div>
+	{% end %}
+</div>
 
+<div class="total_graph">
+	{% for player in players_scores %}
+		<div style="height: {{players_scores[player]}}px;" class="bar"></div>
+	{% end %}
+</div>
 
 {% end %}
