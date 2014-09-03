@@ -51,7 +51,7 @@ class GameHandler(tornado.web.RequestHandler):
 			enter_movie_in_actors_db(movie, Actor.personID)
 			push_ratings_scores_in_game_db(game_id, movie['critics_score'], movie['audience_score'])
 			movie_list = actor_or_actress(Actor)
-			tornado.ioloop.IOLoop.instance().call_later(100, enter_all_movies_in_both_dbases, 
+			tornado.ioloop.IOLoop.instance().call_later(1, enter_all_movies_in_both_dbases, 
 														movie_list, Actor.personID,
 														 game_id)
 
@@ -115,17 +115,22 @@ class RoundHandler(tornado.web.RequestHandler):
 		for player in game_entry["Player scores"]:
 			players.append(player)
 
-		movie = pick_movie_from_game_sessions_db(game_entry)
+		movie = pick_movie_from_game_sessions_db(game_entry["Movies"], game_id)
+		if not movie:
+			self.render("nomovie.html")
+			return False
 		print db.game_sessions.update({"_id": ObjectId(game_id)}, 
 										{ "$set":  {"Critics": movie['critics_score']}})
 		print movie
 		self.render("game_round.html", movie=movie, players=players, game_id=game_id)
 
 
-def pick_movie_from_game_sessions_db(game_entry):
-	print game_entry
-	random_index = random.randint(0, len(game_entry["Movies"]) - 1)
-	return game_entry["Movies"][random_index]
+def pick_movie_from_game_sessions_db(movie_list, game_id):
+	if len(movie_list) == 0:
+		return False
+	movie = movie_list.pop(random.randint(0, len(movie_list) - 1))
+	db.game_sessions.update({"_id": ObjectId(game_id)},{"$set": {"Movies": movie_list}})
+	return movie
 	
 
 def get_actor_object_from_imdb(actor_name):
@@ -358,7 +363,7 @@ def enter_all_movies_in_both_dbases(movie_list, actor_id, game_id):
 		enter_movie_in_actors_db(movie, actor_id)
 		enter_movie_into_game_db(movie, game_id)
 		print "Entered one movie in both dbases."
-		tornado.ioloop.IOLoop.instance().call_later(100, enter_all_movies_in_both_dbases, 
+		tornado.ioloop.IOLoop.instance().call_later(1, enter_all_movies_in_both_dbases, 
 													movie_list, actor_id,
 										 			game_id)
 	else:
@@ -375,7 +380,7 @@ def prepare_movie_dict_entry(movie, critics_score, audience_score):
 					'year': movie['year'],
 		 			'director': movie['director'][0]['name'],
 		 			'plot outline': movie['plot outline'],
-		 			'plot': movie['plot'],
+		 			'plot': movie['plot'][0],
 		 			'full-size cover url': movie['full-size cover url'],
 		 			"critics_score": critics_score,
 		 			"audience_score": audience_score  
