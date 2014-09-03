@@ -31,24 +31,32 @@ class GameHandler(tornado.web.RequestHandler):
 		game_id = start_game_session(players)
 
 		actor_name = self.get_argument('actor_entered')
-		Actor = get_actor_object_from_imdb(actor_name)
-		enter_actor_in_actors_db(Actor)
+		actor_db_entry = is_actor_in_actors_db(actor_name)
 
-		movie = return_appropriate_movie(actor_or_actress(Actor))
-		if not movie:
-			print "No more movies available from that actor. Exiting the game. Please play again soon, but choose a more prolific actor."
-		
-
-		enter_movie_in_actors_db(movie, Actor.personID)
-		push_ratings_scores_in_game_db(game_id, movie['critics_score'], movie['audience_score'])
-		movie_list = actor_or_actress(Actor)
-		tornado.ioloop.IOLoop.instance().call_later(100, enter_all_movies_in_both_dbases, 
-													movie_list, Actor.personID,
-													 game_id)
-
-
-		self.render("game_round.html", title='title', 
+		if actor_db_entry:
+			movie_list = actor_db_entry
+			movie = movie_list.pop(random.randint(0, len(movie_list)))
+			push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie)
+			
+			self.render("game_round.html", title='title', 
 					movie=movie,players=players, game_id=game_id)
+		else:
+			Actor = get_actor_object_from_imdb(actor_name)
+			enter_actor_in_actors_db(Actor)
+
+			movie = return_appropriate_movie(actor_or_actress(Actor))
+			if not movie:
+				print "No more movies available from that actor."
+			
+			enter_movie_in_actors_db(movie, Actor.personID)
+			push_ratings_scores_in_game_db(game_id, movie['critics_score'], movie['audience_score'])
+			movie_list = actor_or_actress(Actor)
+			tornado.ioloop.IOLoop.instance().call_later(100, enter_all_movies_in_both_dbases, 
+														movie_list, Actor.personID,
+														 game_id)
+
+			self.render("game_round.html", title='title', 
+						movie=movie,players=players, game_id=game_id)
 
 
 	def post(self):
@@ -116,7 +124,7 @@ class RoundHandler(tornado.web.RequestHandler):
 
 def pick_movie_from_game_sessions_db(game_entry):
 	print game_entry
-	random_index = random.randint(0, len(game_entry["Movies"]) - 1      )
+	random_index = random.randint(0, len(game_entry["Movies"]) - 1)
 	return game_entry["Movies"][random_index]
 	
 
@@ -147,6 +155,12 @@ def push_ratings_scores_in_game_db(game_id, critics_score, audience_score):
 												})
 
 
+def push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie):
+	db.game_sessions.update({"_id": ObjectId(game_id)}, 
+							{"$set": {"Movies": movie_list,
+							 "Critics": movie['critics_score']}})
+
+
 def create_player_dict(players_str):
 	players_list = players_str.split(',')
 	players = {}
@@ -156,23 +170,17 @@ def create_player_dict(players_str):
 	return players
 
 
-def actor_in_db(actor_name):
+def is_actor_in_actors_db(actor_name):
 	actor_PersonID = False
 	split_name = actor_name.split(' ')
 	print split_name
 	#remove count from number_actors_in_db
-	number_actors_in_db = db.actors.find({ "$and": [{'Last Name': split_name [1].strip()},
-													{'First Name': split_name[0].strip()} ] }).count() 
-	print number_actors_in_db	
+	actor_entry_in_db = db.actors.find({ "$and": [{'Last Name': split_name [1].strip()},
+													{'First Name': split_name[0].strip()} ] }) 
+	print actor_entry_in_db	
  	
- 	if number_actors_in_db > 0:
- 		return True
- 		# actor_search = db.actors.find({'Last Name': str(split_name[1]), 
-			# 								'First Name': str(split_name[0])} , 
-			# 								{'PersonID': 1, '_id': 0})
- 		# for actor in actor_search:
-			# actor_personID = actor['PersonID']
- 		# return True, actor_personID
+ 	if actor_entry_in_db.count() > 0:
+ 		return actor_entry_in_db[0]["Movies"]
  	else:
  		# return False, False
  		return False
