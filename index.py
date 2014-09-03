@@ -35,7 +35,7 @@ class GameHandler(tornado.web.RequestHandler):
 
 		if actor_db_entry:
 			movie_list = actor_db_entry
-			movie = movie_list.pop(random.randint(0, len(movie_list)))
+			movie = movie_list.pop(random.randint(0, len(movie_list) - 1))
 			push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie)
 			
 			self.render("game_round.html", title='title', 
@@ -396,77 +396,9 @@ def prepare_movie_dict_entry(movie, critics_score, audience_score):
 	return movie_dict
 
 
-def search_movieIDs_on_mongodb(actor_id):
-	# movie_info = []
-	movie_ids = []
-
-	movies_with_actor = db.movie_list.find({'PersonID': actor_id}, {'MovieID': 1, '_id': 0 })
-	for entry in movies_with_actor:
-		movie_ids.append(entry['MovieID'])
-
-	return movie_ids
-
-	# for movieID in movie_ids:
-	# 	movie_entry = db.movie_list.find({'MovieID': movieID})
-	# 	movie_info.append(movie_entry)
-
-
-
-
-
-
-class Movie():
-	def __init__(self, MovieID):
-		self.MovieID = MovieID
-		
-		entry_in_mongo = db.actors.find({'MovieID': self.movieID})
-		for entry in entry_in_mongo:
-			self.title = entry['Title']
-			self.year = entry['Year']
-			self.director = entry['Director']
-			self.cast = entry['cast']
-			self.plot_outline = entry['plot_outline']
-			self.plot = entry['Plot']
-			self.critics_score = entry['Critics Rating']
-			self.audience_score = entry['Audience Rating']
-
-
 def update_movie_info(movie):
 	print "updating movie"
 	return imd.update(movie)
-
-
-def enter_filmography(actor_id, filmography, critics_score, audience_score):
-	for movie in filmography:
-		db.actor_filmography.insert({
-									"actor_id": actor_id,
-									"movie_id": movie['id']
-									})
-	for movie in filmography:
-		if not movie_in_db():
-			db.movie_id.insert({"IMDb id": movie.movieID,
-								"title": movie["title"],
-								"Release": movie['year'],
-								"Plot outline": movie['plot outline'],
-								"Full Plot": movie['plot'],
-								"Poster": movie["full-size cover url"],
-								"RT Critics Score": critics_score,
-								"RT Audience Score": audience_score
-
-								})
-
-
-def enter_movies_in_db():
-	for movie in MOVIE_LIST:
-		db.movie_list.insert({'MovieID': movie.movieID,
-								'Title': movie['title'],
-								'Year': movie['year'],
-								'Plot outline': movie['plot outline'],
-								'Plot': movie['plot'],
-								'Director': str(movie['director'][0]),
-								'Poster': movie['full-size cover url']
-								})
-
 
 
 application = tornado.web.Application([
