@@ -41,8 +41,8 @@ class GameHandler(tornado.web.RequestHandler):
 				movie_list = misspelled_name
 				movie = movie_list.pop(random.randint(0, len(movie_list) - 1))
 				push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie)
-				f = open("misspelled_names", "w")
-				f.write(Actor['name'] + ": " + actor_name + "\n")
+				f = open("misspelled_names", "a")
+				f.write(Actor['name'] + " : " + actor_name + "\n")
 				
 				self.render("game_round.html", title='title', 
 							movie=movie,players=players, game_id=game_id)
