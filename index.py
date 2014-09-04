@@ -22,7 +22,7 @@ db = client.mydb
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.render("home.html", title='title',  movie=None, critics_score=None, audience_score=None )
+		self.render("home.html", title='title' )
 
 
 class GameHandler(tornado.web.RequestHandler):
@@ -33,30 +33,43 @@ class GameHandler(tornado.web.RequestHandler):
 		actor_name = self.get_argument('actor_entered')
 		actor_db_entry = is_actor_in_actors_db(actor_name)
 
-		if actor_db_entry:
+		if not actor_db_entry:
+			Actor = get_actor_object_from_imdb(actor_name)
+			misspelled_name = is_actor_in_actors_db(Actor['name'])
+			
+			if misspelled_name:
+				movie_list = misspelled_name
+				movie = movie_list.pop(random.randint(0, len(movie_list) - 1))
+				push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie)
+				f = open("misspelled_names", "w")
+				f.write(Actor['name'] + ": " + actor_name + "\n")
+				
+				self.render("game_round.html", title='title', 
+							movie=movie,players=players, game_id=game_id)
+			else:
+
+				enter_actor_in_actors_db(Actor)
+
+				movie = return_appropriate_movie(actor_or_actress(Actor))
+				
+				enter_movie_in_actors_db(movie, Actor.personID)
+				push_ratings_scores_in_game_db(game_id, movie['critics_score'], movie['audience_score'])
+				movie_list = actor_or_actress(Actor)
+				tornado.ioloop.IOLoop.instance().call_later(1, enter_all_movies_in_both_dbases, 
+															movie_list, Actor.personID,
+															 game_id)
+
+				self.render("game_round.html", title='title', 
+							movie=movie,players=players, game_id=game_id)
+		else:
+
 			movie_list = actor_db_entry
 			movie = movie_list.pop(random.randint(0, len(movie_list) - 1))
 			push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie)
 			
 			self.render("game_round.html", title='title', 
-					movie=movie,players=players, game_id=game_id)
-		else:
-			Actor = get_actor_object_from_imdb(actor_name)
-			enter_actor_in_actors_db(Actor)
-
-			movie = return_appropriate_movie(actor_or_actress(Actor))
-			if not movie:
-				print "No more movies available from that actor."
-			
-			enter_movie_in_actors_db(movie, Actor.personID)
-			push_ratings_scores_in_game_db(game_id, movie['critics_score'], movie['audience_score'])
-			movie_list = actor_or_actress(Actor)
-			tornado.ioloop.IOLoop.instance().call_later(1, enter_all_movies_in_both_dbases, 
-														movie_list, Actor.personID,
-														 game_id)
-
-			self.render("game_round.html", title='title', 
 						movie=movie,players=players, game_id=game_id)
+
 
 
 	def post(self):
@@ -178,9 +191,8 @@ def create_player_dict(players_str):
 def is_actor_in_actors_db(actor_name):
 	actor_PersonID = False
 	split_name = actor_name.split(' ')
-	print split_name
 	#remove count from number_actors_in_db
-	actor_entry_in_db = db.actors.find({ "$and": [{'Last Name': split_name [1].strip()},
+	actor_entry_in_db = db.actors.find({ "$and": [{'Last Name': split_name [-1].strip()},
 													{'First Name': split_name[0].strip()} ] }) 
 	print actor_entry_in_db	
  	
