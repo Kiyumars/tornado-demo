@@ -116,25 +116,28 @@ class RoundHandler(tornado.web.RequestHandler):
 		
 		try:
 			game_id = self.get_argument("game_id")
+			print game_id
 		except:
 			self.redirect("/")
 		print game_id
 
 		game_entry = db.game_sessions.find({"_id": ObjectId(game_id)})[0]
 
-		print game_entry
+		# print game_entry
 
 		players = []
 		for player in game_entry["Player scores"]:
 			players.append(player)
 
 		movie = pick_movie_from_game_sessions_db(game_entry["Movies"], game_id)
+		print "We have come this far."
+
 		if not movie:
 			self.render("nomovie.html")
 			return False
 		print db.game_sessions.update({"_id": ObjectId(game_id)}, 
 										{ "$set":  {"Critics": movie['critics_score']}})
-		print movie
+		print movie['title']
 		self.render("game_round.html", movie=movie, players=players, game_id=game_id)
 
 

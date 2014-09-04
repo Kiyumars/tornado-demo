@@ -1,14 +1,24 @@
 $(document).ready(function(){
+	var cheat_activated = false;
 	$(window).blur(function(){
-		var game_id = $("#game_id").val();
-		vex.dialog.open({
-			message: "Oh, we went to another tab, did we? <br> Maybe went to rottentomatoes.com? <br> NO ROUND FOR YOU.",
-			buttons: [
-				$.extend({}, vex.dialog.buttons.YES, {
-      				text: 'Start new round'})
-			]
+		if (cheat_activated == false){
+			var game = $("#game_id").val();
+			cheat_activated = true;
+			vex.dialog.open({
+				message: "Oh, we went to another tab, did we? <br> Maybe we went to rottentomatoes.com, hmmm? <br> THIS ROUND IS CLOSED!<br>NO POINTS FOR ANYONE!",
+				overlayClosesOnClick: false,
+				buttons: [
+					$.extend({}, vex.dialog.buttons.YES, {
+	      				text: 'Start new round'})
+				],
+				callback: function(){
+					
+						window.location.href = "/next_round?game_id=" + game; 
+					
+				}
 
-		});
+			});
+		}
 	});
 
 
