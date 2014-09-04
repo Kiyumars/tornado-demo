@@ -33,4 +33,20 @@
 		position: relative;
 		background-color: #aeaeae;
 		vertical-align: baseline;
+
+	}
+
+	.img_overlay {
+		position: absolute;
+		top:50%;
+	  	left: 130px;
+
+	}
+
+	.hidden {
+		visibility: hidden;
+	}
+
+	.poster {
+		color: blue;
 	}

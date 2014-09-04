@@ -1,15 +1,25 @@
 $(document).ready(function(){
 	var cheat_activated = false;
+	$(".poster").hover(function(){
+		$(".img_overlay").toggleClass("hidden");
+	});
+
+	$("#reveal_plot").click(function(){
+		$("#entire_plot").show();
+		$("#reveal_plot").hide();
+	});
+
+
 	$(window).blur(function(){
 		if (cheat_activated == false){
 			var game = $("#game_id").val();
 			cheat_activated = true;
 			vex.dialog.open({
-				message: "Oh, we went to another tab, did we? <br> Maybe we went to rottentomatoes.com, hmmm? <br> THIS ROUND IS CLOSED!<br>NO POINTS FOR ANYONE!",
+				message: "Oh, we went to another tab, did we? <br> Maybe we went to rottentomatoes.com, hmmm? <br>NO POINTS FOR ANYONE!",
 				overlayClosesOnClick: false,
 				buttons: [
 					$.extend({}, vex.dialog.buttons.YES, {
-	      				text: 'Start new round'})
+	      				text: 'Start new round. Cheater.'})
 				],
 				callback: function(){
 					

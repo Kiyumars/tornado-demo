@@ -22,7 +22,11 @@
 
 	<h4>Extra Hints</h4>
 
-	Poster: <a href='{{movie["full-size cover url"]}}' target='_blank'> Click here</a><br><br>
+	 <a class='poster'>Want to see poster?</a>
+	 <div class='img_overlay hidden'>
+	 	<img height='400' src='{{movie["full-size cover url"]}}'>
+	 </div>
+	 <br><br> 
 	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot']}} </div><br><br>
 
 	

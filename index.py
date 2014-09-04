@@ -232,7 +232,7 @@ def actor_or_actress(actor):
 
 
 def pick_random_movie_object(movie_list):
-	return movie_list.pop(random.randint(0, len(movie_list) - 1      ))
+	return movie_list.pop(random.randint(0, len(movie_list) - 1))
 
 
 def return_appropriate_movie(movie_list):
