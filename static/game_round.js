@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	var cheat_activated = false;
+	var cheat_activated = true;
 	$(".poster").hover(function(){
 		$(".img_overlay").toggleClass("hidden");
 	});
@@ -11,7 +11,9 @@ $(document).ready(function(){
 
 
 	$(window).blur(function(){
+		// setInterval(function(){alert(window.location.href)}, 3000);
 		if (cheat_activated == false){
+
 			var game = $("#game_id").val();
 			cheat_activated = true;
 			vex.dialog.open({
@@ -30,6 +32,7 @@ $(document).ready(function(){
 			});
 		}
 	});
+
 
 
 });

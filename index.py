@@ -1,4 +1,5 @@
 import sys
+import os
 import logging
 import random
 import json
@@ -42,7 +43,7 @@ class GameHandler(tornado.web.RequestHandler):
 				movie = movie_list.pop(random.randint(0, len(movie_list) - 1))
 				push_movies_from_actorDB_to_gameSessionsDB(game_id, movie_list, movie)
 				f = open("misspelled_names", "a")
-				f.write(Actor['name'] + " : " + actor_name + "\n")
+				f.write(Actor['name'] + " : " + actor_name + ",\n")
 				
 				self.render("game_round.html", title='title', 
 							movie=movie,players=players, game_id=game_id)
@@ -294,7 +295,7 @@ def request_json_from_rt(movieID, request_type):
 	print "What is the request type? in request_json_from_rt"
 	print request_type
 
-	key= '5wzpmvz79dzzj8g5exucf8qv'
+	key= os.environ['rt_key']
 	if request_type == "movie_alias":
 		print "movie_alias"
 		url_string = "http://api.rottentomatoes.com/api/public/v1.0/" + request_type + ".json?apikey=" + key + "&type=imdb&id=" + movieID

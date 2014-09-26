@@ -1,5 +1,6 @@
 
 	$(document).ready(function(){
+		$("#start_game").attr('disabled', 'disabled');
 
 
 
