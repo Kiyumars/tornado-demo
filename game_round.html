@@ -7,15 +7,15 @@
 {% block game_content %}
 	<div id="movie_info_field">
 
-		 <movie_info><h3> Title:   {{movie['title']}} </h3></movie_info>
+		 <h3> Title:   {{movie['title']}} </h3>
 
-	<movie_info>Released in {{movie['year']}} </movie_info><br><br>
-	<movie_info>Director: {{movie['director'] }} </movie_info><br><br>
+	<key>Released</key> in {{movie['year']}} <br><br>
+	<key>Director:</key> {{movie['director'] }} <br><br>
 	{% if movie['cast'][:5] %}
-	Cast: {% for cast in movie['cast'][:5] %} {{cast}}, {% end %} 
+	<key>Cast:</key> {% for cast in movie['cast'][:5] %} {{cast}}, {% end %} 
 	{% end %} 
 	<br><br>
-	Plot outline: {{movie['plot outline']}} 	
+	<key>Plot outline:</key> {{movie['plot outline']}} 	
 
 	<h4>Extra Hints</h4>
 
@@ -24,7 +24,7 @@
 	 	<img height='400' src='{{movie["full-size cover url"]}}'>
 	 </div>
 	 <br><br> 
-	Full plot description: <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot']}} </div><br><br>
+	<key>Full plot description:<key> <button id='reveal_plot'>Show full plot</button><div id='entire_plot'> {{movie['plot']}} </div><br><br>
 
 	
 	<form method="GET" action="/score_update">

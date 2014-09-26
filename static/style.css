@@ -13,7 +13,7 @@
 		background-size: cover;
 		font-family: 'Roboto Slab', serif;
 	}
-	#movie_info_field, #enter_info, #game_rules {
+	#movie_info_field, #enter_info, #game_rules, #score {
 		background-color: white;
 		opacity: 0.74;
 		font-weight: heavy;
@@ -132,3 +132,8 @@ input[type='text']:focus {
 .poster {
 	color: green;
 }
+
+key {
+	font-weight: 900;
+}
+
