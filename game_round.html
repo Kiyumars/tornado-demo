@@ -5,9 +5,9 @@
 {% end %}
 
 {% block game_content %}
+	<div id="movie_info_field">
 
-
-		 <movie_info><h3>Title:   {{movie['title']}} </h3></movie_info>
+		 <movie_info><h3> Title:   {{movie['title']}} </h3></movie_info>
 
 	<movie_info>Released in {{movie['year']}} </movie_info><br><br>
 	<movie_info>Director: {{movie['director'] }} </movie_info><br><br>
@@ -15,8 +15,7 @@
 	Cast: {% for cast in movie['cast'][:5] %} {{cast}}, {% end %} 
 	{% end %} 
 	<br><br>
-	Plot outline: {{movie['plot outline']}} <br><br>
-	
+	Plot outline: {{movie['plot outline']}} 	
 
 	<h4>Extra Hints</h4>
 
@@ -35,4 +34,5 @@
 		<input type='hidden' id='game_id' name='game_id' value='{{ game_id }}'>
 		<input type="submit" value='Submit guesses'>
 	</form>
+	</div>
 {% end %}

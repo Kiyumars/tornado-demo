@@ -9,9 +9,18 @@
 		}
 
 	body {
-
-		background: white;
+		background: url('bright_green.jpg');
+		background-size: cover;
 		font-family: 'Roboto Slab', serif;
+	}
+	#movie_info_field, #enter_info, #game_rules {
+		background-color: white;
+		opacity: 0.74;
+		font-weight: heavy;
+		width: 600px;
+		margin: 0 auto;
+		padding: 10px;
+		border-radius: 5px;
 	}
 
 	.guess_graph {
@@ -83,7 +92,7 @@ button#reveal_pot {
 	font-size : 20px;
 	color : #ffffff;
 	padding : 1px 17px;
-	background : #5f6166;
+	background: #000;round : #5f6166;
 	background : -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5f6166), color-stop(100%,#00060a));
 	background : -moz-linear-gradient(top, #5f6166 0%, #00060a 100%);
 	background : -webkit-linear-gradient(top, #5f6166 0%, #00060a 100%);
@@ -94,14 +103,14 @@ button#reveal_pot {
 }
 
 
-input[type='text'] {
+input[type='text'], #actor_entered, #players {
 	<input type="text"class="inputs" placeholder="e-mail" /> 
 
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     background-color: #EAEAEA;
-    background: -moz-linear-gradient(top, #FFF, #EAEAEA);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FFF), color-stop(1.0, #EAEAEA));
+    /*background: -moz-linear-gradient(top, #FFF, #EAEAEA);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FFF), color-stop(1.0, #EAEAEA));*/
     border: 1px solid #CACACA;
     color: #444;
     font-size: 14px;
@@ -119,6 +128,7 @@ input[type='text']:focus {
     -moz-transform: scale(1.05);
     transform: scale(1.05);
 }
-lt;/style> 
 
+.poster {
+	color: green;
 }
