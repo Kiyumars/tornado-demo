@@ -9,8 +9,10 @@
 		}
 
 	body {
-		background: url('bright_green.jpg');
+		background: url('bg.jpg');
 		background-size: cover;
+		background-position: bottom;
+
 		font-family: 'Roboto Slab', serif;
 	}
 	#movie_info_field, #enter_info, #game_rules, #score {
