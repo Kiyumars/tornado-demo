@@ -11,6 +11,7 @@ decorator==3.4.0
 lxml==3.3.5
 pbr==0.10.0
 pymongo==2.7.2
+requests==2.4.0
 rottentomatoes==1.1
 six==1.7.3
 sqlalchemy-migrate==0.9.1
